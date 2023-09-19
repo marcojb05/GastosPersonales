@@ -32,6 +32,13 @@ class CategoriasGastos (models.Model):
     categoria= models.CharField(max_length=100, db_column='categoria')
     class Meta:
         db_table="CategoriasGastos"
+
+# Tabla CategoriasIngresos
+class CategoriasIngresos (models.Model):
+    idCategoriaIngreso = models.AutoField(primary_key=True, default=1, db_column='idCategoriaIngreso')
+    categoria= models.CharField(max_length=100, db_column='categoria')
+    class Meta:
+        db_table="CategoriasIngresos"
     
 # Tabla MetodosPago
 class MetodosPago (models.Model):
@@ -56,22 +63,23 @@ class MetasFinancieras (models.Model):
     class Meta:
         db_table="MetasFinancieras"
         
-# Tabla CuentaBancaria
-class CuentaBancaria (models.Model):
-    idCuenta = models.AutoField(primary_key=True, db_column='idMetodo')
+# Tabla Cuenta
+class Cuenta (models.Model):
+    idCuenta = models.AutoField(primary_key=True, db_column='idCuenta')
     numCuenta = models.CharField(max_length=18, db_column='numCuenta')
     fk_idMetodo = models.ForeignKey(MetodosPago, on_delete=models.CASCADE, db_column='fk_idMetodo')
     class Meta:
-        db_table="CuentaBancaria"
+        db_table="Cuenta"
     
 # Tabla Ingresos
 class Ingresos (models.Model):
     idIngreso = models.IntegerField(primary_key=True, db_column='idIngreso')
     cantidad = models.IntegerField(db_column='cantidad')
     descripcion = models.CharField(max_length=100, db_column='descripcion')
-    fecha = models.DateField(db_column='fecha')
-    fk_CategoriaIngreso = models.ForeignKey(CategoriasGastos, on_delete=models.CASCADE, db_column='fk_idCategoriaIngreso')
+    fecha = models.DateField(db_column='fechaIngreso')
+    fk_CategoriaIngreso = models.ForeignKey(CategoriasIngresos, on_delete=models.CASCADE, db_column='fk_idCategoriaIngreso')
     fk_idTipoMoneda = models.ForeignKey(TiposMoneada, on_delete=models.CASCADE, db_column='fk_idTipoMoneda')
+    fk_idCuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE, db_column='fk_idCuenta')
     class Meta:
         db_table="Ingresos"
         
@@ -83,17 +91,17 @@ class Gastos (models.Model):
     fecha = models.DateField(db_column='fecha')
     fk_CategoriaIngreso = models.ForeignKey(CategoriasGastos, on_delete=models.CASCADE, db_column='fk_idCategoriaIngreso')
     fk_idTipoMoneda = models.ForeignKey(TiposMoneada, on_delete=models.CASCADE, db_column='fk_idTipoMoneda')
-    fk_idMetodoPago = models.ForeignKey(MetodosPago, on_delete=models.CASCADE, db_column='fk_idMetodoPago')
+    fk_idCuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE, db_column='fk_idCuenta')
     class Meta:
         db_table="Gastos"
         
-# Tabla Ahorros
+########### Tabla Ahorros
 class Ahorros (models.Model):
     idAhorro = models.IntegerField(primary_key=True, db_column='idAhorro')
     cantidad = models.IntegerField(db_column='cantidad')
     descripcion = models.CharField(max_length=100, db_column='descripcion')
     fecha = models.DateField(db_column='fecha')
-    fk_CategoriaIngreso = models.ForeignKey(CategoriasGastos, on_delete=models.CASCADE, db_column='fk_idCategoriaIngreso')
+    fk_CategoriaIngreso = models.ForeignKey(CategoriasIngresos, on_delete=models.CASCADE, db_column='fk_idCategoriaIngreso')
     class Meta:
         db_table="Ahorros"
         

@@ -65,7 +65,7 @@ class MetasFinancieras (models.Model):
         
 # Tabla Cuenta
 class Cuenta (models.Model):
-    idCuenta = models.AutoField(primary_key=True, db_column='idCuenta')
+    idCuenta = models.AutoField(primary_key=True, default=1, db_column='idCuenta')
     numCuenta = models.CharField(max_length=18, db_column='numCuenta')
     fk_idMetodo = models.ForeignKey(MetodosPago, on_delete=models.CASCADE, db_column='fk_idMetodo')
     class Meta:
@@ -73,7 +73,7 @@ class Cuenta (models.Model):
     
 # Tabla Ingresos
 class Ingresos (models.Model):
-    idIngreso = models.IntegerField(primary_key=True, db_column='idIngreso')
+    idIngreso = models.IntegerField(primary_key=True, default=1, db_column='idIngreso')
     cantidad = models.IntegerField(db_column='cantidad')
     descripcion = models.CharField(max_length=100, db_column='descripcion')
     fecha = models.DateField(db_column='fechaIngreso')
@@ -85,7 +85,7 @@ class Ingresos (models.Model):
         
 # Tabla Gastos
 class Gastos (models.Model):
-    idGasto = models.IntegerField(primary_key=True, db_column='idIngreso')
+    idGasto = models.IntegerField(primary_key=True, default=1, db_column='idIngreso')
     cantidad = models.IntegerField(db_column='cantidad')
     descripcion = models.CharField(max_length=100, db_column='descripcion')
     fecha = models.DateField(db_column='fecha')
@@ -97,17 +97,17 @@ class Gastos (models.Model):
         
 ########### Tabla Ahorros
 class Ahorros (models.Model):
-    idAhorro = models.IntegerField(primary_key=True, db_column='idAhorro')
+    idAhorro = models.IntegerField(primary_key=True, default=1, db_column='idAhorro')
     cantidad = models.IntegerField(db_column='cantidad')
     descripcion = models.CharField(max_length=100, db_column='descripcion')
     fecha = models.DateField(db_column='fecha')
-    fk_CategoriaIngreso = models.ForeignKey(CategoriasIngresos, on_delete=models.CASCADE, db_column='fk_idCategoriaIngreso')
+    fk_Ingreso = models.ForeignKey(Ingresos, on_delete=models.CASCADE, db_column='fk_idIngreso')
     class Meta:
         db_table="Ahorros"
         
 # Tabla Deudas
 class Deudas (models.Model):
-    idDeuda = models.IntegerField(primary_key=True, db_column='idDeuda')
+    idDeuda = models.IntegerField(primary_key=True, default=1, db_column='idDeuda')
     cantidad = models.IntegerField(db_column='cantidad')
     descripcion = models.CharField(max_length=100, db_column='descripcion')
     fechaPago = models.DateField(db_column='fechaPago')
@@ -117,7 +117,7 @@ class Deudas (models.Model):
         
 # Tabla BalanceGeneral
 class BalanceGeneral (models.Model):
-    idBalance = models.IntegerField(primary_key=True, db_column='idDeuda')
+    idBalance = models.IntegerField(primary_key=True, default=1, db_column='idBalance')
     fk_idGasto = models.ForeignKey(Gastos, on_delete=models.CASCADE, db_column='fk_idGasto')
     fk_idIngreso = models.ForeignKey(Ingresos, on_delete=models.CASCADE, db_column='fk_idIngreso')
     fk_idDeuda = models.ForeignKey(Deudas, on_delete=models.CASCADE, db_column='fk_idDeuda')

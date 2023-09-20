@@ -17,15 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from api.views import Home, Login, Registro, Reestablecer, Botones, Tarjetas, Graficas, Tablas, Animacion, Border, Color, Otro, Blank, Error404
+from api import views
 
 urlpatterns = [
-    #path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('', Home.as_view(), name='index'),
+    path('signup/', views.Registrar, name="registro"),
     #login/: es lo que se verá en el navegador y sin extensión
     #Login.as_view(): Es la importación de la plantilla, es decir, la muestra, transforma y hace visible
     #name='login': Es el nombre que se utilizará para navegar entre situaciones
-    path('login/', Login.as_view(), name='login'),
-    path('registro/', Registro.as_view(), name="registro"),
+    path('login/', views.signin, name='login'),
+    path('logout/', views.signout, name='logout'),
+    #path('registro/', Registro.as_view(), name="registro"),
     path('reestablecer/', Reestablecer.as_view(), name="reestablecer"),
     path('botones/', Botones.as_view(), name="botones"),
     path('tarjetas/', Tarjetas.as_view(), name="tarjetas"),

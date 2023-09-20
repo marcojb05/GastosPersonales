@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from api.views import Home, Login, Registro, Reestablecer
+from api.views import Home, Login, Registro, Reestablecer, Botones, Tarjetas, Graficas, Tablas, Animacion, Border, Color, Otro, Blank, Error404
 
 urlpatterns = [
     #path('admin/', admin.site.urls),
@@ -26,5 +26,15 @@ urlpatterns = [
     #name='login': Es el nombre que se utilizará para navegar entre situaciones
     path('login/', Login.as_view(), name='login'),
     path('registro/', Registro.as_view(), name="registro"),
-    path('reestablecer/', Reestablecer.as_view(), name="reestablecer")
+    path('reestablecer/', Reestablecer.as_view(), name="reestablecer"),
+    path('botones/', Botones.as_view(), name="botones"),
+    path('tarjetas/', Tarjetas.as_view(), name="tarjetas"),
+    path('graficas/', Graficas.as_view(), name="graficas"),
+    path('tablas/', Tablas.as_view(), name="tablas"),
+    path('animacion/', Animacion.as_view(), name="animacion"),
+    path('border/', Border.as_view(), name="border"),
+    path('color/', Color.as_view(), name="color"),
+    path('otro/', Otro.as_view(), name="otro"),
+    path('error404/', Error404.as_view(), name="error404"),
+    path('blank/', Blank.as_view(), name="blank"),
 ]

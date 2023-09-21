@@ -38,13 +38,6 @@
                                 <h1 class="h4 text-gray-900 mb-4">¡Crea una cuenta!</h1>
                             </div>
 
-                            {% comment %} FORMULARIO FUNCIONAL {% endcomment %}
-                            <form action="/signup/" method="POST" class="user">
-                                
-                                {{error}}
-                            
-                            </form>
-
                             {% comment %} FORMULARIO CORREGIDO {% endcomment %}
                             <form action="/signup/" method="POST" class="user">
                                 {% csrf_token %}

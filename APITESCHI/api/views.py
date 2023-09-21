@@ -1,3 +1,4 @@
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from django.contrib.auth.views import LoginView
@@ -26,6 +27,12 @@ def Registrar(request):
                                                 username=request.POST['username'],
                                                 password=request.POST['password1'])
                 user.save()
+                subject = 'Te damos la bienvenida'
+                message = 'Hola'
+                from_email = 'antonio2552001@gmail.com'
+                recipient_list = [request.POST['username']]
+
+                send_mail(subject, message, from_email, recipient_list)
                 #Se envía el request y el usuario
                 login(request, user)
                 return redirect('login')
@@ -35,9 +42,9 @@ def Registrar(request):
                     "error": 'El usuario ya existe'
                 })
         return render(request, 'signup.html',{
-                    'form': UserCreationForm,
-                    "error": 'Las contraseñas no coinciden'
-                })
+            'form': UserCreationForm,
+            "error": 'Las contraseñas no coinciden'
+        })
 
 #Cierra la sesión
 def signout (request):

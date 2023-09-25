@@ -25,12 +25,13 @@ def Registrar(request):
                 user = User.objects.create_user(first_name=request.POST['first_name'],
                                                 last_name=request.POST['last_name'],
                                                 username=request.POST['username'],
+                                                email=request.POST['email'],
                                                 password=request.POST['password1'])
                 user.save()
                 subject = 'Te damos la bienvenida'
-                message = 'Hola'
+                message = 'Hola '+request.POST['first_name']+", tu cuenta ha sido activada."
                 from_email = 'antonio2552001@gmail.com'
-                recipient_list = [request.POST['username']]
+                recipient_list = [request.POST['email']]
 
                 send_mail(subject, message, from_email, recipient_list)
                 #Se envía el request y el usuario
@@ -39,7 +40,7 @@ def Registrar(request):
             except:
                 return render(request, 'signup.html',{
                     'form': UserCreationForm,
-                    "error": 'El usuario ya existe'
+                    "error": 'El usuario o email ya han sido registrados'
                 })
         return render(request, 'signup.html',{
             'form': UserCreationForm,
@@ -100,6 +101,27 @@ class Registro (APIView):
     def get(self, request):
         return render(request, self.template_name)
 
+    def post(self, request):
+        return render(request, self.template_name)
+
+class Cuenta (APIView):
+    template_name = "cuenta.html"
+    def get(self, request):
+        return render(request, self.template_name)
+    def post(self, request):
+        return render(request, self.template_name)
+
+class Notificaciones (APIView):
+    template_name = "notificaciones.html"
+    def get(self, request):
+        return render(request, self.template_name)
+    def post(self, request):
+        return render(request, self.template_name)
+
+class Conexiones (APIView):
+    template_name = "conexiones.html"
+    def get(self, request):
+        return render(request, self.template_name)
     def post(self, request):
         return render(request, self.template_name)
 

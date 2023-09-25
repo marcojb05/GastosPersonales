@@ -125,13 +125,45 @@ class Conexiones (APIView):
     def post(self, request):
         return render(request, self.template_name)
 
-
-class Reestablecer (APIView):
-    template_name = "forgot-password.html"
-
+class Movimientos (APIView):
+    template_name = "movimientos.html"
     def get(self, request):
         return render(request, self.template_name)
+    def post(self, request):
+        return render(request, self.template_name)
 
+class Ingresos (APIView):
+    template_name = "ingresos.html"
+    def get(self, request):
+        return render(request, self.template_name)
+    def post(self, request):
+        return render(request, self.template_name)
+
+class Gastos (APIView):
+    template_name = "gastos.html"
+    def get(self, request):
+        return render(request, self.template_name)
+    def post(self, request):
+        return render(request, self.template_name)
+
+class Ahorros (APIView):
+    template_name = "ahorros.html"
+    def get(self, request):
+        return render(request, self.template_name)
+    def post(self, request):
+        return render(request, self.template_name)
+
+class DeudasPagos (APIView):
+    template_name = "movimientos.html"
+    def get(self, request):
+        return render(request, self.template_name)
+    def post(self, request):
+        return render(request, self.template_name)
+    
+class Reestablecer (APIView):
+    template_name = "forgot-password.html"
+    def get(self, request):
+        return render(request, self.template_name)
     def post(self, request):
         return render(request, self.template_name)
 

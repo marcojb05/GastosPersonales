@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from api.views import Home, Login, Registro, Reestablecer, Botones, Tarjetas, Graficas, Tablas, Animacion, Border, Color, Otro, Blank, Error404, Cuenta, Notificaciones, Conexiones
+from api.views import Home, Reestablecer, Botones, Tarjetas, Graficas, Tablas, Animacion, Border, Color, Otro, Blank, Error404, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos
 from api import views
 from django.views.generic.base import RedirectView
 
@@ -33,7 +33,6 @@ urlpatterns = [
     #name='login': Es el nombre que se utilizará para navegar entre situaciones
     path('login/', views.signin, name='login'),
     path('logout/', views.signout, name='logout'),
-    #path('registro/', Registro.as_view(), name="registro"),
     path('reestablecer/', Reestablecer.as_view(), name="reestablecer"),
     path('botones/', Botones.as_view(), name="botones"),
     path('tarjetas/', Tarjetas.as_view(), name="tarjetas"),
@@ -48,4 +47,10 @@ urlpatterns = [
     path('cuenta/', Cuenta.as_view(), name="cuenta"),
     path('notificaciones/', Notificaciones.as_view(), name="notificaciones"),
     path('conexiones/', Conexiones.as_view(), name="conexiones"),
+    path('movimientos/', Movimientos.as_view(), name="movimientos"),
+    path('ingresos/', Ingresos.as_view(), name="ingresos"),
+    path('gastos/', Gastos.as_view(), name="gastos"),
+    path('pagos/', Gastos.as_view(), name="pagos"),
+    path('ahorros/', Ahorros.as_view(), name="ahorros"),
+    path('deudasypagos/', DeudasPagos.as_view(), name="deudasypagos"),
 ]

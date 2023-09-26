@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from api.views import Home, Reestablecer, Blank, Error404, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas
+from api.views import Home, Reestablecer, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas
 from api import views
 from django.views.generic.base import RedirectView
 
@@ -34,8 +34,6 @@ urlpatterns = [
     path('login/', views.signin, name='login'),
     path('logout/', views.signout, name='logout'),
     path('reestablecer/', Reestablecer.as_view(), name="reestablecer"),
-    path('error404/', Error404.as_view(), name="error404"),
-    path('blank/', Blank.as_view(), name="blank"),
     path('cuenta/', Cuenta.as_view(), name="cuenta"),
     path('notificaciones/', Notificaciones.as_view(), name="notificaciones"),
     path('conexiones/', Conexiones.as_view(), name="conexiones"),

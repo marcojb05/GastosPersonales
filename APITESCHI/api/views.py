@@ -5,13 +5,13 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User  # Permite el registro
 from django.contrib.auth import login, logout, authenticate # Permite crear la cookie con el registro del login
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 # Create your views here.
 
 # Crea una vista para el registro
 
-
 def Registrar(request):
-
     if request.method == "GET":
         return render(request, "signup.html", {
             'form': UserCreationForm
@@ -72,38 +72,17 @@ def signin(request):
             login(request, user)
             return redirect('index')
         
-
+@method_decorator(login_required, name='dispatch')
 class Home (APIView):
     template_name = "index.html"
     # self es el equivalente del this en Java, hace referencia a sí mismo
     # request se consume
-
     def get(self, request):
         return render(request, self.template_name)
-
     def post(self, request):
         return render(request, self.template_name)
 
-
-class Login (LoginView):
-    template_name = "login.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        return render(request, self.template_name)
-
-
-class Registro (APIView):
-    template_name = "register.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        return render(request, self.template_name)
-
+@method_decorator(login_required, name='dispatch')
 class Cuenta (APIView):
     template_name = "cuenta.html"
     def get(self, request):
@@ -111,6 +90,7 @@ class Cuenta (APIView):
     def post(self, request):
         return render(request, self.template_name)
 
+@method_decorator(login_required, name='dispatch')
 class Notificaciones (APIView):
     template_name = "notificaciones.html"
     def get(self, request):
@@ -118,6 +98,7 @@ class Notificaciones (APIView):
     def post(self, request):
         return render(request, self.template_name)
 
+@method_decorator(login_required, name='dispatch')
 class Conexiones (APIView):
     template_name = "conexiones.html"
     def get(self, request):
@@ -132,6 +113,7 @@ class Movimientos (APIView):
     def post(self, request):
         return render(request, self.template_name)
 
+@method_decorator(login_required, name='dispatch')
 class Ingresos (APIView):
     template_name = "ingresos.html"
     def get(self, request):
@@ -139,6 +121,7 @@ class Ingresos (APIView):
     def post(self, request):
         return render(request, self.template_name)
 
+@method_decorator(login_required, name='dispatch')
 class Gastos (APIView):
     template_name = "gastos.html"
     def get(self, request):
@@ -146,6 +129,7 @@ class Gastos (APIView):
     def post(self, request):
         return render(request, self.template_name)
 
+@method_decorator(login_required, name='dispatch')
 class Ahorros (APIView):
     template_name = "ahorros.html"
     def get(self, request):
@@ -153,6 +137,7 @@ class Ahorros (APIView):
     def post(self, request):
         return render(request, self.template_name)
 
+@method_decorator(login_required, name='dispatch')
 class DeudasPagos (APIView):
     template_name = "deudasypagos.html"
     def get(self, request):
@@ -160,6 +145,7 @@ class DeudasPagos (APIView):
     def post(self, request):
         return render(request, self.template_name)
 
+@method_decorator(login_required, name='dispatch')
 class Tarjetas (APIView):
     template_name = "tarjetas.html"
     def get(self, request):
@@ -167,35 +153,18 @@ class Tarjetas (APIView):
     def post(self, request):
         return render(request, self.template_name)
 
+@method_decorator(login_required, name='dispatch')
 class Metas (APIView):
     template_name = "metas.html"
     def get(self, request):
         return render(request, self.template_name)
     def post(self, request):
         return render(request, self.template_name)
-    
+
+@method_decorator(login_required, name='dispatch')
 class Reestablecer (APIView):
     template_name = "forgot-password.html"
     def get(self, request):
         return render(request, self.template_name)
-    def post(self, request):
-        return render(request, self.template_name)
-
-class Error404 (APIView):
-    template_name = "404.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        return render(request, self.template_name)
-
-
-class Blank (APIView):
-    template_name = "blank.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
     def post(self, request):
         return render(request, self.template_name)

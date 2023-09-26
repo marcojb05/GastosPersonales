@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from api.views import Home, Reestablecer, Botones, Tarjetas, Graficas, Tablas, Animacion, Border, Color, Otro, Blank, Error404, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos
+from api.views import Home, Reestablecer, Blank, Error404, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas
 from api import views
 from django.views.generic.base import RedirectView
 
@@ -34,14 +34,6 @@ urlpatterns = [
     path('login/', views.signin, name='login'),
     path('logout/', views.signout, name='logout'),
     path('reestablecer/', Reestablecer.as_view(), name="reestablecer"),
-    path('botones/', Botones.as_view(), name="botones"),
-    path('tarjetas/', Tarjetas.as_view(), name="tarjetas"),
-    path('graficas/', Graficas.as_view(), name="graficas"),
-    path('tablas/', Tablas.as_view(), name="tablas"),
-    path('animacion/', Animacion.as_view(), name="animacion"),
-    path('border/', Border.as_view(), name="border"),
-    path('color/', Color.as_view(), name="color"),
-    path('otro/', Otro.as_view(), name="otro"),
     path('error404/', Error404.as_view(), name="error404"),
     path('blank/', Blank.as_view(), name="blank"),
     path('cuenta/', Cuenta.as_view(), name="cuenta"),
@@ -53,4 +45,6 @@ urlpatterns = [
     path('pagos/', Gastos.as_view(), name="pagos"),
     path('ahorros/', Ahorros.as_view(), name="ahorros"),
     path('deudasypagos/', DeudasPagos.as_view(), name="deudasypagos"),
+    path('tarjetas/', Tarjetas.as_view(), name="tarjetas"),
+    path('metas/', Metas.as_view(), name="metas"),
 ]

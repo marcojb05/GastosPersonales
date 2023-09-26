@@ -28,7 +28,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Gastos</title>
+    <title>Deudas y pagos</title>
 
     <meta name="description" content="" />
 
@@ -165,7 +165,7 @@
                     <div data-i18n="Without navbar">Ingresos</div>
                   </a>
                 </li>
-                <li class="menu-item active">
+                <li class="menu-item">
                   <a href="{% url 'gastos'%}" class="menu-link">
                     <div data-i18n="Without navbar">Gastos</div>
                   </a>
@@ -175,7 +175,7 @@
                     <div data-i18n="Container">Ahorrros</div>
                   </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item active">
                   <a href="{% url 'deudasypagos'%}" class="menu-link">
                     <div data-i18n="Fluid">Deudas y pagos</div>
                   </a>
@@ -333,10 +333,10 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
               <h4 class="fw-bold py-3 mb-4">
-                <span class="text-muted fw-light">Control financiero / </span> Gastos
+                <span class="text-muted fw-light">Control financiero / </span> Deudas y pagos
               </h4>
 
-              <!-- Hoverable Table rows -->
+              <!-- Formulario de deudas -->
               <div class="card">
                 
                 <div class="card-body demo-vertical-spacing demo-only-element">
@@ -349,9 +349,68 @@
                       <div class="card-body">
                         <form>
                           <div class="mb-3">
-                            <label class="form-label" for="basic-icon-default-fullname">Fecha:</label>
+                            <label class="form-label" for="fecha">Fecha:</label>
                             <div class="form-control">
-                              <input class="form-control" type="date" value="2021-06-18" id="html5-date-input" />
+                              <input class="form-control" type="date" value="2021-06-18" id="fecha" />
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label" for="basic-icon-default-phone">Frecuencia del pago:</label>
+                            <div class="form-check mt-2">
+                              <input
+                                name="frecuencia"
+                                class="form-check-input"
+                                type="radio"
+                                value=""
+                                id="unico"
+                              />
+                              <label class="form-check-label" for="unico"> Único </label>
+                            </div>
+                            <div class="form-check mt-2">
+                              <input
+                                name="frecuencia"
+                                class="form-check-input"
+                                type="radio"
+                                value=""
+                                id="diario"
+                              />
+                              <label class="form-check-label" for="diario"> Diario </label>
+                            </div>
+                            <div class="form-check mt-2">
+                              <input
+                                name="frecuencia"
+                                class="form-check-input"
+                                type="radio"
+                                value=""
+                                id="semanal"
+                              />
+                              <label class="form-check-label" for="semanal"> Semanal </label>
+                            </div>
+                            <div class="form-check mt-2">
+                              <input
+                                name="frecuencia"
+                                class="form-check-input"
+                                type="radio"
+                                value=""
+                                id="quincenal"
+                              />
+                              <label class="form-check-label" for="quincenal"> Quincenal </label>
+                            </div>
+                            <div class="form-check mt-2">
+                              <input
+                                name="frecuencia"
+                                class="form-check-input"
+                                type="radio"
+                                value=""
+                                id="mensual"
+                              />
+                              <label class="form-check-label" for="mensual"> Mensual </label>
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label" for="fechaLimite">Fecha límite:</label>
+                            <div class="form-control">
+                              <input class="form-control" type="date" value="2021-06-18" id="fechaLimite" />
                             </div>
                           </div>
                           <div class="mb-3">
@@ -371,7 +430,7 @@
                             <label class="form-label" for="basic-icon-default-email">Moneda:</label>
                             <div class="input-group input-group-merge">
                               <span class="input-group-text"><i class='bx bx-category'></i></span>
-                              <select class="form-select" id="exampleFormControlSelect1" aria-label="Default select example">
+                              <select class="form-select" id="moneda" aria-label="Selecciona el tipo de moneda">
                                 <option selected>Selecciona el tipo de moneda</option>
                                 <option value="1">MXN</option>
                                 <option value="2">USD</option>
@@ -383,7 +442,7 @@
                             <label class="form-label" for="basic-icon-default-email">Categoría</label>
                             <div class="input-group input-group-merge">
                               <span class="input-group-text"><i class='bx bx-category'></i></span>
-                              <select class="form-select" id="exampleFormControlSelect1" aria-label="Default select example">
+                              <select class="form-select" id="categoria" aria-label="Selecciona una categoría">
                                 <option selected>Selecciona una categoría</option>
                                 <option value="1">Comida</option>
                                 <option value="2">Transporte</option>
@@ -396,7 +455,7 @@
                             <label class="form-label" for="basic-icon-default-phone">Método de pago:</label>
                             <div class="form-check mt-2">
                               <input
-                                name="default-radio-1"
+                                name="metodoPago"
                                 class="form-check-input"
                                 type="radio"
                                 value=""
@@ -406,7 +465,7 @@
                             </div>
                             <div class="form-check mt-2">
                               <input
-                                name="default-radio-1"
+                                name="metodoPago"
                                 class="form-check-input"
                                 type="radio"
                                 value=""
@@ -416,7 +475,7 @@
                             </div>
                             <div class="form-check mt-2">
                               <input
-                                name="default-radio-1"
+                                name="metodoPago"
                                 class="form-check-input"
                                 type="radio"
                                 value=""
@@ -447,67 +506,232 @@
                   </div>
                 </div>
               </div><hr>
+              <!--/ Formulario de deudas -->
+
+              <!-- Hoverable Table rows -->
               <div class="card">
-                <!-- Expense Overview -->
-                <div>
-                  <div>
-                    <div class="card-header">
-                      <ul class="nav nav-pills" role="tablist">
-                        <li class="nav-item">
-                          <button
-                            type="button"
-                            class="nav-link active"
-                            role="tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#navs-tabs-line-card-income"
-                            aria-controls="navs-tabs-line-card-income"
-                            aria-selected="true"
-                          >
-                            Income
-                          </button>
-                        </li>
-                        <li class="nav-item">
-                          <button type="button" class="nav-link" role="tab">Expenses</button>
-                        </li>
-                        <li class="nav-item">
-                          <button type="button" class="nav-link" role="tab">Profit</button>
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="card-body px-0">
-                      <div class="tab-content p-0">
-                        <div class="tab-pane fade show active" id="navs-tabs-line-card-income" role="tabpanel">
-                          <div class="d-flex p-4 pt-3">
-                            <div class="avatar flex-shrink-0 me-3">
-                              <img src="{% static 'assets/img/icons/unicons/wallet.png'%}" alt="User" />
-                            </div>
-                            <div>
-                              <small class="text-muted d-block">Total Balance</small>
-                              <div class="d-flex align-items-center">
-                                <h6 class="mb-0 me-1">$459.10</h6>
-                                <small class="text-success fw-semibold">
-                                  <i class="bx bx-chevron-up"></i>
-                                  42.9%
-                                </small>
-                              </div>
+                <h5 class="card-header">Hoverable rows</h5>
+                <div class="table-responsive text-nowrap">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Concepto</th>
+                        <th>Fecha</th>
+                        <th>Cantidad</th>
+                        <th>Frecuencia</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                      <tr>
+                        <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>Angular Project</strong></td>
+                        <td>Albert Cook</td>
+                        <td>
+                          <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Lilian Fuller"
+                            >
+                              <img src="{% static 'assets/img/avatars/5.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Sophia Wilkerson"
+                            >
+                              <img src="{% static 'assets/img/avatars/6.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Christina Parker"
+                            >
+                              <img src="{% static 'assets/img/avatars/7.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                          </ul>
+                        </td>
+                        <td><span class="badge bg-label-primary me-1">Active</span></td>
+                        <td>
+                          <div class="dropdown">
+                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                              <i class="bx bx-dots-vertical-rounded"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="bx bx-edit-alt me-1"></i> Edit</a
+                              >
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="bx bx-trash me-1"></i> Delete</a
+                              >
                             </div>
                           </div>
-                          <div id="incomeChart"></div>
-                          <div class="d-flex justify-content-center pt-4 gap-2">
-                            <div class="flex-shrink-0">
-                              <div id="expensesOfWeek"></div>
-                            </div>
-                            <div>
-                              <p class="mb-n1 mt-1">Expenses This Week</p>
-                              <small class="text-muted">$39 less than last week</small>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><i class="fab fa-react fa-lg text-info me-3"></i> <strong>React Project</strong></td>
+                        <td>Barry Hunter</td>
+                        <td>
+                          <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Lilian Fuller"
+                            >
+                              <img src="{% static 'assets/img/avatars/5.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Sophia Wilkerson"
+                            >
+                              <img src="{% static 'assets/img/avatars/6.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Christina Parker"
+                            >
+                              <img src="{% static 'assets/img/avatars/7.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                          </ul>
+                        </td>
+                        <td><span class="badge bg-label-success me-1">Completed</span></td>
+                        <td>
+                          <div class="dropdown">
+                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                              <i class="bx bx-dots-vertical-rounded"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="bx bx-edit-alt me-1"></i> Edit</a
+                              >
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="bx bx-trash me-1"></i> Delete</a
+                              >
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><i class="fab fa-vuejs fa-lg text-success me-3"></i> <strong>VueJs Project</strong></td>
+                        <td>Trevor Baker</td>
+                        <td>
+                          <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Lilian Fuller"
+                            >
+                              <img src="{% static 'assets/img/avatars/5.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Sophia Wilkerson"
+                            >
+                              <img src="{% static 'assets/img/avatars/6.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Christina Parker"
+                            >
+                              <img src="{% static 'assets/img/avatars/7.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                          </ul>
+                        </td>
+                        <td><span class="badge bg-label-info me-1">Scheduled</span></td>
+                        <td>
+                          <div class="dropdown">
+                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                              <i class="bx bx-dots-vertical-rounded"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="bx bx-edit-alt me-1"></i> Edit</a
+                              >
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="bx bx-trash me-1"></i> Delete</a
+                              >
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <i class="fab fa-bootstrap fa-lg text-primary me-3"></i> <strong>Bootstrap Project</strong>
+                        </td>
+                        <td>Jerry Milton</td>
+                        <td>
+                          <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Lilian Fuller"
+                            >
+                              <img src="{% static 'assets/img/avatars/5.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Sophia Wilkerson"
+                            >
+                              <img src="{% static 'assets/img/avatars/6.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                            <li
+                              data-bs-toggle="tooltip"
+                              data-popup="tooltip-custom"
+                              data-bs-placement="top"
+                              class="avatar avatar-xs pull-up"
+                              title="Christina Parker"
+                            >
+                              <img src="{% static 'assets/img/avatars/7.png'%}" alt="Avatar" class="rounded-circle" />
+                            </li>
+                          </ul>
+                        </td>
+                        <td><span class="badge bg-label-warning me-1">Pending</span></td>
+                        <td>
+                          <div class="dropdown">
+                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                              <i class="bx bx-dots-vertical-rounded"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="bx bx-edit-alt me-1"></i> Edit</a
+                              >
+                              <a class="dropdown-item" href="javascript:void(0);"
+                                ><i class="bx bx-trash me-1"></i> Delete</a
+                              >
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-                <!--/ Expense Overview -->
               </div>
               <!--/ Hoverable Table rows -->
             </div>

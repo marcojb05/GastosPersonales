@@ -154,7 +154,21 @@ class Ahorros (APIView):
         return render(request, self.template_name)
 
 class DeudasPagos (APIView):
-    template_name = "movimientos.html"
+    template_name = "deudasypagos.html"
+    def get(self, request):
+        return render(request, self.template_name)
+    def post(self, request):
+        return render(request, self.template_name)
+
+class Tarjetas (APIView):
+    template_name = "tarjetas.html"
+    def get(self, request):
+        return render(request, self.template_name)
+    def post(self, request):
+        return render(request, self.template_name)
+
+class Metas (APIView):
+    template_name = "metas.html"
     def get(self, request):
         return render(request, self.template_name)
     def post(self, request):
@@ -166,87 +180,6 @@ class Reestablecer (APIView):
         return render(request, self.template_name)
     def post(self, request):
         return render(request, self.template_name)
-
-
-class Botones (APIView):
-    template_name = "buttons.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        return render(request, self.template_name)
-
-
-class Tarjetas (APIView):
-    template_name = "cards.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        return render(request, self.template_name)
-
-
-class Graficas (APIView):
-    template_name = "charts.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        return render(request, self.template_name)
-
-
-class Tablas (APIView):
-    template_name = "tables.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        return render(request, self.template_name)
-
-
-class Animacion (APIView):
-    template_name = "utilities-animation.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        return render(request, self.template_name)
-
-
-class Border (APIView):
-    template_name = "utilities-border.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        return render(request, self.template_name)
-
-
-class Color (APIView):
-    template_name = "utilities-color.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        return render(request, self.template_name)
-
-
-class Otro (APIView):
-    template_name = "utilities-other.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-    def post(self, request):
-        return render(request, self.template_name)
-
 
 class Error404 (APIView):
     template_name = "404.html"

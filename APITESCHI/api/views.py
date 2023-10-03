@@ -7,6 +7,8 @@ from django.contrib.auth.models import User  # Permite el registro
 from django.contrib.auth import login, logout, authenticate # Permite crear la cookie con el registro del login
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 # Create your views here.
 
 # Crea una vista para el registro
@@ -19,7 +21,7 @@ def Registrar(request):
     else:
         print(request.POST)
         if request.POST['password1'] == request.POST['password2']:
-            try:
+            
                 # Registro del usuario
                 # Devuelve un objeto user y es un usuario que se puede guardar en la bd
                 user = User.objects.create_user(first_name=request.POST['first_name'],
@@ -28,20 +30,34 @@ def Registrar(request):
                                                 email=request.POST['email'],
                                                 password=request.POST['password1'])
                 user.save()
+                
                 subject = 'Te damos la bienvenida'
-                message = 'Hola '+request.POST['first_name']+", tu cuenta ha sido activada."
+                message = 'Este es el mensaje de texto.'
                 from_email = 'antonio2552001@gmail.com'
                 recipient_list = [request.POST['email']]
 
-                send_mail(subject, message, from_email, recipient_list)
+                # Crea el contenido HTML
+                html_message = render_to_string('correo/Bienvenida.html',
+                                                {'username':request.POST['username'],
+                                                 'password':request.POST['password1']})
+                plain_message = strip_tags(html_message)
+
+                send_mail(subject, message, from_email, recipient_list, html_message=html_message)
+                
+                # html_message = render_to_string('correo/Bienvenida.html',
+                #                                 {'username':request.POST['username'],
+                #                                  'password':request.POST['password']})
+                # plain_message = strip_tags(html_message)
+                # subject = 'Te damos la bienvenida'
+                # #message = 'Hola '+request.POST['first_name']+", tu cuenta ha sido activada."
+                # from_email = 'antonio2552001@gmail.com'
+                # recipient_list = [request.POST['email']]
+
+                # send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
                 #Se envía el request y el usuario
                 login(request, user)
                 return redirect('login')
-            except:
-                return render(request, 'signup.html',{
-                    'form': UserCreationForm,
-                    "error": 'El usuario o email ya han sido registrados'
-                })
+            
         return render(request, 'signup.html',{
             'form': UserCreationForm,
             "error": 'Las contraseñas no coinciden'

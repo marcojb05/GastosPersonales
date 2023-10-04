@@ -38,11 +38,12 @@ def Registrar(request):
 
                 # Crea el contenido HTML
                 html_message = render_to_string('correo/Bienvenida.html',
-                                                {'username':request.POST['username'],
+                                                {'nombre':request.POST['first_name'],
+                                                 'username':request.POST['username'],
                                                  'password':request.POST['password1']})
                 plain_message = strip_tags(html_message)
 
-                send_mail(subject, message, from_email, recipient_list, html_message=html_message)
+                send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
                 
                 # html_message = render_to_string('correo/Bienvenida.html',
                 #                                 {'username':request.POST['username'],

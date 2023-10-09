@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from api.views import Home, Reestablecer, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas
+from api.views import Home, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, tabla_html
 from api import views
 from django.views.generic.base import RedirectView
 
@@ -33,7 +33,7 @@ urlpatterns = [
     #name='login': Es el nombre que se utilizará para navegar entre situaciones
     path('login/', views.signin, name='login'),
     path('logout/', views.signout, name='logout'),
-    path('reestablecer/', Reestablecer.as_view(), name="reestablecer"),
+    path('reestablecer/', views.Reestablecer, name="reestablecer"),
     path('cuenta/', Cuenta.as_view(), name="cuenta"),
     path('notificaciones/', Notificaciones.as_view(), name="notificaciones"),
     path('conexiones/', Conexiones.as_view(), name="conexiones"),
@@ -44,5 +44,7 @@ urlpatterns = [
     path('ahorros/', Ahorros.as_view(), name="ahorros"),
     path('deudasypagos/', DeudasPagos.as_view(), name="deudasypagos"),
     path('tarjetas/', Tarjetas.as_view(), name="tarjetas"),
+    path('tabla/', tabla_html.as_view(), name="tabla"),
     path('metas/', Metas.as_view(), name="metas"),
+    path('exportar_excel/', views.exportar_excel, name='exportar_excel'),
 ]

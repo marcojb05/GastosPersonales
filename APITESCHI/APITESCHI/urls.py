@@ -44,7 +44,9 @@ urlpatterns = [
     path('ahorros/', Ahorros.as_view(), name="ahorros"),
     path('deudasypagos/', DeudasPagos.as_view(), name="deudasypagos"),
     path('tarjetas/', Tarjetas.as_view(), name="tarjetas"),
-    path('tabla/', tabla_html.as_view(), name="tabla"),
+    path('tabla/', views.lista_carros, name="tabla"),
     path('metas/', Metas.as_view(), name="metas"),
-    path('exportar_excel/', views.exportar_excel, name='exportar_excel'),
+    path('descargar_excel/', views.descargar_excel, name='descargar_excel'),
+    path('tabla_carros/', views.tabla_carros, name='tabla_carros'), 
+   path('descargar_excel/', views.descargar_excel, name='descargar_excel'),
 ]

@@ -374,9 +374,9 @@
                               <span class="input-group-text"><i class='bx bx-category'></i></span>
                               <select class="form-select" id="moneda" aria-label="Selecciona el tipo de moneda">
                                 <option selected>Selecciona el tipo de moneda</option>
-                                <option value="1">MXN</option>
-                                <option value="2">USD</option>
-                                <option value="3">EUR</option>
+                                {% for moneda in monedas %}
+                                  <option value="{{ moneda.id_moneda }}">{{ moneda.nombre_moneda }}</option>
+                                {% endfor %}
                               </select>
                             </div>
                           </div>
@@ -386,9 +386,9 @@
                               <span class="input-group-text"><i class='bx bx-category'></i></span>
                               <select class="form-select" id="categoria" aria-label="Selecciona una categoría">
                                 <option selected>Selecciona una categoría</option>
-                                <option value="1">Comida</option>
-                                <option value="2">Transporte</option>
-                                <option value="3">Educación</option>
+                                {% for categoria in categorias %}
+                                  <option value="{{ categoria.id_categoria}}">{{ categoria.nombre}}</option>
+                                {% endfor %}
                               </select>
                             </div>
                             <div class="form-text">Selecciona una categoría correspondiente al gasto.</div>

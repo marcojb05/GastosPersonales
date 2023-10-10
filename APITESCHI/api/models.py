@@ -29,21 +29,21 @@ class alumno_has_genero (models.Model):
         
 # Modelo de métodos de pago
 class TipoTransaccion(models.Model):
-    id_tipo = models.IntegerField(primary_key=True, db_column='id_tipo')
+    id_tipo = models.CharField(primary_key=True, max_length=10, db_column='id_tipo')
     tipo_transaccion = models.CharField(max_length=255)
     class Meta:
         db_table='TipoTransaccion'
 
 # Modelo de métodos de pago
 class MetodoDePago(models.Model):
-    id_metodotipo = models.IntegerField(primary_key=True, db_column='id_metodotipo')
+    id_metodotipo = models.CharField(primary_key=True, max_length=5, db_column='id_metodotipo')
     nombre_metodo = models.CharField(max_length=255)
     class Meta:
         db_table='MetodoDePago'
 
 # Modelo de categorías de transacciones
 class Categoria(models.Model):
-    id_categoria = models.IntegerField(primary_key=True, db_column='id_categoria')
+    id_categoria = models.CharField(primary_key=True, max_length=10, db_column='id_categoria')
     fk_tipo = models.ForeignKey(TipoTransaccion, on_delete=models.CASCADE, default=None, db_column='fk_tipo')
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField()
@@ -52,7 +52,7 @@ class Categoria(models.Model):
 
 # Modelo de cuentas bancarias
 class Cuenta(models.Model):
-    id_cuenta = models.IntegerField(primary_key=True, db_column='id_cuenta', default=1)
+    id_cuenta = models.CharField(primary_key=True, max_length=22, db_column='id_cuenta')
     fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1, db_column='fk_usuario')
     nombre_cuenta= models.CharField(max_length=100, db_column='nombre_cuenta')
     fk_metodo_pago = models.ForeignKey(MetodoDePago, on_delete=models.CASCADE, default=None, db_column='fk_metodo_pago')
@@ -61,7 +61,7 @@ class Cuenta(models.Model):
 
 # Modelo de ahorros
 class Ahorro(models.Model):
-    id_ahorro = models.IntegerField(primary_key=True, db_column='id_ahorro')
+    id_ahorro = models.CharField(primary_key=True, max_length=10, db_column='id_ahorro')
     fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=None, db_column='fk_usuario')
     fk_cuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE, default=1, db_column='fk_cuenta')
     descripcion = models.TextField()
@@ -72,7 +72,7 @@ class Ahorro(models.Model):
 
 # Modelo de pagos
 class Pago(models.Model):
-    id_pago = models.IntegerField(primary_key=True, db_column='id_pago')
+    id_pago = models.CharField(primary_key=True, max_length=10, db_column='id_pago')
     fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=None, db_column='fk_usuario')
     nombre_deuda = models.CharField(max_length=255)
     descripcion = models.TextField()
@@ -85,7 +85,7 @@ class Pago(models.Model):
 
 # Modelo de metas financieras
 class MetaFinanciera(models.Model):
-    id_meta = models.IntegerField(primary_key=True, db_column='id_meta')
+    id_meta = models.CharField(primary_key=True, max_length=10, db_column='id_meta')
     fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=None, db_column='fk_usuario')
     descripcion = models.TextField()
     objetivo = models.DecimalField(max_digits=10, decimal_places=2)
@@ -96,8 +96,7 @@ class MetaFinanciera(models.Model):
 
 # Modelo de monedas
 class Moneda(models.Model):
-    id_moneda = models.IntegerField(primary_key=True, db_column='id_moneda')
-    codigo_moneda = models.CharField(max_length=3)
+    id_moneda = models.CharField(primary_key=True, max_length=3, db_column='id_moneda')
     nombre_moneda = models.CharField(max_length=255)
     simbolo_moneda = models.CharField(max_length=10)
     class Meta:
@@ -105,7 +104,7 @@ class Moneda(models.Model):
 
 # Modelo de transacciones
 class Transaccion(models.Model):
-    id_transaccion = models.IntegerField(primary_key=True, db_column='id_transaccion')
+    id_transaccion = models.CharField(primary_key=True, max_length=15, db_column='id_transaccion')
     fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=None, db_column='fk_usuario')
     fk_cuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE, default=1, db_column='fk_cuenta')
     fkcategoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, default=None, db_column='fkcategoria')
@@ -116,3 +115,9 @@ class Transaccion(models.Model):
     fk_moneda = models.ForeignKey(Moneda, on_delete=models.CASCADE, default=None, db_column='fk_moneda')
     class Meta:
         db_table='Transaccion'
+        
+class Carro(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=100)
+    modelo = models.CharField(max_length=50)
+    año = models.PositiveIntegerField()

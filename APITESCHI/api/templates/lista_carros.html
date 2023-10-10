@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tabla de Carros</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Icons. Uncomment required icon fonts -->
+    <link rel="stylesheet" href="{%static 'assets/vendor/fonts/boxicons.css'%}" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{%static 'assets/vendor/css/core.css'%}" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="{%static 'assets/vendor/css/theme-default.css'%}" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="{%static 'assets/css/demo.css'%}" />
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="{%static 'assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css'%}" />
+
+    <!-- Page CSS -->
+
+    <!-- Helpers -->
+    <script src="{%static 'assets/vendor/js/helpers.js'%}"></script>
+
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="{%static 'assets/js/config.js'%}"></script>
+</head>
+<body>
+    <h1>Tabla de Carros</h1>
+    <form method="get" action="{% url 'tabla_carros' %}">
+        <input type="text" name="search" placeholder="Buscar...">
+        <button type="submit">Buscar</button>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre del Carro</th>
+                <th>Modelo</th>
+                <th>Año</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for carro in carros %}
+            <tr>
+                <td>{{ carro.id }}</td>
+                <td>{{ carro.nombre }}</td>
+                <td>{{ carro.modelo }}</td>
+                <td>{{ carro.año }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if carros %}
+    <a href="{% url 'descargar_excel' %}?search={{ request.GET.search }}">Descargar Excel</a>
+    {% endif %}
+</body>
+</html>
+
+
+
+<script>
+    // Obtén la referencia al campo de búsqueda y a las filas de datos
+    var input = document.getElementById("searchInput");
+    var dataRows = document.getElementById("dataRows").getElementsByTagName("tr");
+
+    // Agrega un evento de escucha al campo de búsqueda
+    input.addEventListener("keyup", function () {
+        var filter = input.value.toUpperCase();
+
+        // Itera a través de las filas de datos y muestra/oculta según la búsqueda
+        for (var i = 0; i < dataRows.length; i++) {
+            var cells = dataRows[i].getElementsByTagName("td");
+            var found = false;
+
+            for (var j = 0; j < cells.length; j++) {
+                var cell = cells[j];
+                if (cell) {
+                    var textValue = cell.textContent || cell.innerText;
+                    if (textValue.toUpperCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            // Muestra u oculta la fila de datos según si se encuentra la búsqueda
+            if (found) {
+                dataRows[i].style.display = "";
+            } else {
+                dataRows[i].style.display = "none";
+            }
+        }
+    });
+</script>

@@ -490,7 +490,7 @@
             </tr>
         </tbody>
     </table>
-    <!-- Agrega un botón para exportar a Excel -->
+    {% comment %} <!-- Agrega un botón para exportar a Excel -->
     <form method="post" action="{% url 'exportar_excel' %}">
         {% csrf_token %}
         <input type="hidden" name="data" id="tableData" value="">
@@ -505,7 +505,7 @@
             tableData.append('data', table.outerHTML);
             document.getElementById('tableData').value = table.outerHTML;
         });
-    </script>
+    </script> {% endcomment %}
     
 
     <script>

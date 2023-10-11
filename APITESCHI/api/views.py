@@ -16,13 +16,11 @@ from django.contrib.auth.models import User
 import secrets
 import string
 # Importación de los modelos
-#from .models import Moneda, Categoria, Cuenta, MetodoDePago, Transaccion, TipoTransaccion
+from .models import Moneda, Categoria, Tarjeta, MetodoPago, Transaccion, TipoTransaccion
 
 # Create your views here.
 
 # Crea una vista para el registro
-
-
 def Registrar(request):
     if request.method == "GET":
         return render(request, "signup.html", {
@@ -61,15 +59,11 @@ def Registrar(request):
         })
 
 # Cierra la sesión
-
-
 def signout(request):
     logout(request)
     return redirect('login')
 
 # Iniciar sesión
-
-
 def signin(request):
     if request.method == "GET":
         return render(request, 'login.html', {
@@ -146,7 +140,7 @@ class Movimientos (APIView):
     def post(self, request):
         return render(request, self.template_name)
 
-
+# Ingresos del usuario
 @method_decorator(login_required, name='dispatch')
 class Ingresos (APIView):
     template_name = "ingresos.html"
@@ -239,8 +233,8 @@ class Tarjetas(APIView):
             return render(request, self.template_name, {'error': 'Todos los campos son obligatorios'})
         else:
             try:
-                tipo_pago = MetodoDePago.objects.get(id_metodotipo=tipo)
-                nuevaCuenta = Cuenta(id_cuenta=numero,
+                tipo_pago = MetodoPago.objects.get(id_metodotipo=tipo)
+                nuevaCuenta = Tarjeta(id_cuenta=numero,
                                     nombre_cuenta=nombre,
                                     fk_metodo_pago=tipo_pago,
                                     fk_usuario=usuario)

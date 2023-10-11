@@ -10,19 +10,13 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
 # Para la generación de contraseña Aleatoria
 import secrets
 import string
 # Importación de los modelos
-from .models import Moneda, Categoria, Cuenta, MetodoDePago, Transaccion
-import pandas as pd
-from django.http import HttpResponse
-from io import BytesIO
-from .models import Carro
-from django.shortcuts import render
+#from .models import Moneda, Categoria, Cuenta, MetodoDePago, Transaccion, TipoTransaccion
 
 # Create your views here.
 
@@ -56,8 +50,8 @@ def Registrar(request):
                                              'password': request.POST['password1']})
             plain_message = strip_tags(html_message)
 
-            enviarCorreo(subject, plain_message, recipient_list,
-                         html_message=html_message)
+            enviarCorreo(subject, plain_message,
+                                 recipient_list, html_message)
             login(request, user)
             return redirect('login')
 
@@ -142,6 +136,7 @@ class Conexiones (APIView):
         return render(request, self.template_name)
 
 
+@method_decorator(login_required, name='dispatch')
 class Movimientos (APIView):
     template_name = "movimientos.html"
 
@@ -165,18 +160,27 @@ class Ingresos (APIView):
                                                     'categorias': categorias})
 
     def post(self, request):
-        nuevaTransaccion = Transaccion(id_transaccion='123123',
-                                       fk_usuario='2',
-                                       fk_cuenta='12358432547554',
-                                       fkcategoria='CAT-01',
-                                       fk_tipo='Ingreso',
+        cantidad = request.POST['cantidad']
+        if cantidad is None:
+            return render(request, self.template_name, {'error': 'Todos los campos son obligatorios'})
+        else:
+            try:
+                #cuenta = Cuenta.objects.get(id_cuenta='12358432547554')
+                nuevaTransaccion = Transaccion(id_transaccion='123123',
+                                       fk_usuario=User.objects.get(id='2'),
+                                       fk_cuenta=Cuenta.objects.get(id_cuenta='12358432547554'),
+                                       fkcategoria=Categoria.objects.get(id_categoria='CAT-01'),
+                                       fk_tipo=TipoTransaccion.objects.get(id_tipo='TP-ING'),
                                        descripcion='Ejemplo de ingreso',
                                        monto='350',
                                        fecha='2023-10-10',
-                                       fk_moneda='MXN')
-        nuevaTransaccion.save()
-        return render(request, self.template_name)
-
+                                       fk_moneda=Moneda.objects.get(id_moneda='MXN')
+                )
+                nuevaTransaccion.save()
+                return render(request, self.template_name)
+            except IntegrityError:
+                return render(request, self.template_name, {'error': 'Hubo un problema al agregar la cuenta'})
+        
 
 @method_decorator(login_required, name='dispatch')
 class Gastos (APIView):
@@ -299,7 +303,6 @@ def Reestablecer(request):
     })
 
 
-@method_decorator(login_required, name='dispatch')
 def enviarCorreo(subject, plain_message, recipient_list, html_message):
     send_mail(subject, plain_message, 'antonio2552001@gmail.com',
               recipient_list, html_message=html_message)
@@ -313,47 +316,3 @@ class tabla_html(APIView):
 
     def post(self, request):
         return render(request, self.template_name)
-    
-def tabla_carros(request):
-    carros = Carro.objects.all()
-
-    # Obtén el parámetro de búsqueda de la URL
-    search_query = request.GET.get('search', '')
-
-    # Filtrar los carros según la búsqueda (si se ha realizado una búsqueda)
-    if search_query:
-        carros = carros.filter(
-            nombre__icontains=search_query
-            # Puedes agregar más campos para filtrar según tus necesidades
-        )
-
-    return render(request, 'lista_carros.html', {'carros': carros})
-
-# TRABAJO DE LA TABLA
-def lista_carros(request):
-    carros = Carro.objects.all()
-    return render(request, 'lista_carros.html', {'carros': carros})
-
-def descargar_excel(request):
-    search_query = request.GET.get('search', '')
-    carros = Carro.objects.filter(nombre__icontains=search_query)
-
-    # Crear un DataFrame de pandas con los datos de los carros filtrados
-    data = {
-        'ID': [carro.id for carro in carros],
-        'Nombre del Carro': [carro.nombre for carro in carros],
-        'Modelo': [carro.modelo for carro in carros],
-        'Año': [carro.año for carro in carros],
-    }
-    df = pd.DataFrame(data)
-
-    # Exportar el DataFrame a un archivo Excel
-    excel_buffer = BytesIO()
-    with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
-        df.to_excel(writer, index=False, sheet_name='Carros')
-
-    # Crear una respuesta HTTP para el archivo Excel
-    response = HttpResponse(excel_buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename="carros.xlsx"'
-
-    return response

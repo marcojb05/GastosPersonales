@@ -372,11 +372,13 @@
                         <h5 class="mb-0">Registro de ingresos</h5>
                       </div>
                       <div class="card-body">
-                        <form class="mb-3" action="/ingresos/" method="POST>
+                        <form class="mb-3" action="/ingresos/" method="POST">
+                          {% csrf_token %}
+                          {{error}}
                           <div class="mb-3">
                             <label class="form-label" for="fecha">Fecha:</label>
                             <div class="form-control">
-                              <input class="form-control" type="date" value="2021-06-18" id="fecha" />
+                              <input class="form-control" type="date" holder="2021-06-18" id="fecha" />
                             </div>
                           </div>
                           <div class="mb-3">
@@ -390,6 +392,7 @@
                                 placeholder="Cantidad"
                                 aria-label="Cantidad"
                                 id="cantidad"
+                                name="cantidad"
                               />
                             </div>
                           </div>

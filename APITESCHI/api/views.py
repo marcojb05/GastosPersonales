@@ -10,7 +10,6 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-import tablib
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
@@ -18,8 +17,7 @@ from django.contrib.auth.models import User
 import secrets
 import string
 # Importación de los modelos
-from .models import Moneda
-from .models import Categoria, Cuenta, MetodoDePago
+from .models import Moneda, Categoria, Cuenta, MetodoDePago, Transaccion
 import pandas as pd
 from django.http import HttpResponse
 from io import BytesIO
@@ -162,11 +160,21 @@ class Ingresos (APIView):
         # Consulta las monedas registradas en la BD
         monedas = Moneda.objects.all()
         # Consultas para ingresos
-        categorias = Categoria.objects.filter(fk_tipo=2)
+        categorias = Categoria.objects.filter(fk_tipo='TP-ING')
         return render(request, self.template_name, {'monedas': monedas,
                                                     'categorias': categorias})
 
     def post(self, request):
+        nuevaTransaccion = Transaccion(id_transaccion='123123',
+                                       fk_usuario='2',
+                                       fk_cuenta='12358432547554',
+                                       fkcategoria='CAT-01',
+                                       fk_tipo='Ingreso',
+                                       descripcion='Ejemplo de ingreso',
+                                       monto='350',
+                                       fecha='2023-10-10',
+                                       fk_moneda='MXN')
+        nuevaTransaccion.save()
         return render(request, self.template_name)
 
 
@@ -210,39 +218,32 @@ class DeudasPagos (APIView):
 
 
 @method_decorator(login_required, name='dispatch')
-class Tarjetas (APIView):
+class Tarjetas(APIView):
     template_name = "Tarjetas.html"
 
     def get(self, request):
         return render(request, self.template_name)
 
     def post(self, request):
-        numero = request.POST['numero']
-        nombre = request.POST['nombre']
-        tipo = MetodoDePago.objects.get(id_metodotipo=request.POST['tipo'])
+        numero = request.POST.get('numero')
+        nombre = request.POST.get('nombre')
+        tipo = request.POST.get('tipo')
         usuario = User.objects.get(id=2)
+
         # Comprobar que no vengan datos vacíos
         if not numero or not nombre or not tipo:
             return render(request, self.template_name, {'error': 'Todos los campos son obligatorios'})
         else:
             try:
-                extraUsuario = Cuenta(
-                    id_cuenta = numero,
-                    nombre_cuenta = nombre,
-                    fk_metodo_pago = tipo,
-                    fk_usuario = usuario,
-                )
-                extraUsuario.save()
-
-                # nuevaCuenta = Cuenta(id_cuenta=numero,
-                #                      nombre_cuenta=nombre,
-                #                      fk_metodo_pago=tipo,
-                #                      fk_usuario=usuario)
-                # #puesto = Puesto.objects.get(idPuesto=puestoid)
-                # nuevaCuenta.save()
+                tipo_pago = MetodoDePago.objects.get(id_metodotipo=tipo)
+                nuevaCuenta = Cuenta(id_cuenta=numero,
+                                    nombre_cuenta=nombre,
+                                    fk_metodo_pago=tipo_pago,
+                                    fk_usuario=usuario)
+                nuevaCuenta.save()  # Save the new Cuenta object to the database
                 return render(request, self.template_name)  # Página de éxito
             except IntegrityError:
-                return render(request, self.template_name, {'error': 'Hubo un problema al crear la cuenta'})
+                return render(request, self.template_name, {'error': 'Hubo un problema al agregar la cuenta'})
 
 
 @method_decorator(login_required, name='dispatch')

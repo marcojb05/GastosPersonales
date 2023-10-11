@@ -346,7 +346,7 @@
                         <h5 class="mb-0">Registro de tarjetas</h5>
                       </div>
                       <div class="card-body">
-                        <form id="cuenta" class="mb-3" action="/tarjetas/" method="POST">
+                        <form id="cuenta" class="mb-3" action="{% url 'tarjetas'%}" method="POST">
                           {{error}}
                           {% csrf_token %}
                           <div class="mb-3">

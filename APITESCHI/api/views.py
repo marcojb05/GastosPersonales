@@ -1,4 +1,5 @@
 from datetime import datetime
+import datetime
 from sqlite3 import IntegrityError
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect, get_object_or_404
@@ -138,16 +139,59 @@ class Movimientos (APIView):
     template_name = "movimientos.html"
 
     def get(self, request):
-        fecha_inicio = '2023-01-01'  # Define tu fecha de inicio
-        fecha_fin = '2023-12-31'  # Define tu fecha de fin
-
-        transacciones_entre_fechas = Transaccion.objects.filter(
-            Q(fecha__gte=fecha_inicio) & Q(fecha__lte=fecha_fin)
-        )
-        return render(request, self.template_name,{'transacciones':transacciones_entre_fechas})
+        fecha_actual = datetime.date.today()
+        primerDia = fecha_actual.replace(day=1)
+        
+        # Calcula el primer día del próximo mes restando un día al primer día del mes actual
+        primer_dia_del_proximo_mes = fecha_actual.replace(day=1) + datetime.timedelta(days=31)
+        # Resta un día al primer día del próximo mes para obtener el último día del mes actual
+        ultimoDia = primer_dia_del_proximo_mes - datetime.timedelta(days=1)
+        
+        fechaInicio = primerDia
+        fechaFin = ultimoDia
+        
+        if self.verifica:
+            context = self.get_context_data(fechaInicio, fechaFin, '', '')
+            return render(request, self.template_name, context)
+        else:
+            
+            return render(request, self.template_name, context)
+            
 
     def post(self, request):
-        return render(request, self.template_name)
+        if self.verifica:
+            try:
+                fechaInicio = request.POST['fechaInicio']
+                fechaFin = request.POST['fechaFin']
+                context = self.get_context_data(fechaInicio, fechaFin, 'none', '')
+                return render(request, self.template_name, context)
+            except Exception as e:
+                context = self.get_context_data('','','block', f"Los datos ingresados no son válidos: {str(e)}", 'none', '')
+                return render(request, self.template_name, context)
+                
+        else:
+            
+            return render(request, self.template_name, context)
+    
+    def verifica(self):
+        if 'fechaInicial' is not self.request.POST or 'fechaFinal' is not self.request.POST:
+            return False
+        else:
+            return True
+    
+    def get_context_data(self, fechaInicio, fechaFin, mostrarError, error):
+        # Obtiene el usuairo y su ID
+        usuario = self.request.user
+        usuario_id = usuario.id
+        
+        # Consulta las transacciones según las fechas y el usuario
+        transacciones_entre_fechas = Transaccion.objects.filter(
+            Q(fecha__gte=fechaInicio) & Q(fecha__lte=fechaFin),
+            fk_usuario=usuario_id
+        )
+        return {
+            'transacciones': transacciones_entre_fechas
+        }
 
 # Ingresos del usuario
 @method_decorator(login_required, name='dispatch')

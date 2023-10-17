@@ -1,5 +1,5 @@
 -- SQLite
--- INSERCIÓN DE MONEDAS
+/* -- INSERCIÓN DE MONEDAS
 INSERT INTO moneda VALUES('MXN', 'Peso mexicano','$'),
 ('USD', 'Dólar Estadounidense','$'),
 ('EUR', 'Euro','€');
@@ -46,4 +46,6 @@ INSERT INTO MetodoPago VALUES ('MP-EFEC', 'Efectivo'),
 ('MP-TARJ', 'Tarjeta'),
 ('MP-CUEN', 'Cuenta');
 
-INSERT INTO Tarjeta VALUES ('12358432547554','Mercado Pago','MP-TARJ',1);
+INSERT INTO Tarjeta VALUES ('12358432547554','Mercado Pago','MP-TARJ',1); */
+
+INSERT INTO tarjeta VALUES ('1-EFEC','Efectivo','MP-EFEC',1);

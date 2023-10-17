@@ -172,7 +172,7 @@
                 </li>
                 <li class="menu-item">
                   <a href="{% url 'ahorros'%}" class="menu-link">
-                    <div data-i18n="Container">Ahorrros</div>
+                    <div data-i18n="Container">Ahorros</div>
                   </a>
                 </li>
                 <li class="menu-item">
@@ -346,32 +346,53 @@
                       <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Registro de metas financieras</h5>
                       </div>
+                      <div class="alert alert-danger alert-dismissible" id="alerta"
+                        role="alert" style="display: {{ mostrarError }};">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                        <div id="mensaje" class="alert alert-success alert-dismissible"
+                          role="alert" style="display: {{ mostrarMensaje }};">
+                        {{ mensaje }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
                       <div class="card-body">
-                        <form>
+                        <form class="mb-3" action="/metas/" method="POST">
+                          {% csrf_token %}
                           <div class="mb-3">
-                            <label class="form-label" for="cantidad">Cantidad</label>
+                            <label class="form-label" for="cantidad">Objetivo</label>
                             <div class="input-group">
                               <span class="input-group-text">$</span>
                               <input
                                 type="number"
                                 min="0"
                                 class="form-control"
-                                placeholder="Cantidad"
-                                id="cantidad"
+                                placeholder="Objetivo"
+                                id="objetivo"
+                                name="objetivo"
+                                required
                               />
                             </div>
                           </div>
                           <div class="row">
                             <div class="mb-3 col-md-6">
-                              <label class="form-label" for="fechaInicial">Fecha inicial:</label>
+                              <label class="form-label" for="fechaInicio">Fecha inicial:</label>
                               <div class="form-control">
-                                <input class="form-control" type="date" value="2021-06-18" id="fechaInicial" />
+                                <input class="form-control"
+                                  type="date"
+                                  id="fechaInicio"
+                                  name="fechaInicio"
+                                  required />
                               </div>
                             </div>
                             <div class="mb-3 col-md-6">
                               <label class="form-label" for="fechaTermino">Fecha de termino:</label>
                               <div class="form-control">
-                                <input class="form-control" type="date" value="2021-06-18" id="fechaTermino" />
+                                <input class="form-control"
+                                  type="date"
+                                  id="fechaTermino"
+                                  name="fechaTermino"
+                                  required />
                               </div>
                             </div>
                           </div>
@@ -383,10 +404,12 @@
                               ></span>
                               <textarea
                                 id="nota"
+                                name="nota"
                                 class="form-control"
                                 placeholder="Notas de la meta"
                                 aria-label="Notas de la meta"
-                                aria-describedby="basic-icon-default-message2"
+                                aria-describedby="Notas de la meta"
+                                required
                               ></textarea>
                             </div>
                           </div>
@@ -404,7 +427,7 @@
                   <table class="table table-hover">
                     <thead>
                       <tr>
-                        <th>Cantidad</th>
+                        <th>Objetivo</th>
                         <th>Fecha inicial</th>
                         <th>Fecha de termino</th>
                         <th>Estado</th>

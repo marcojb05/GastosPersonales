@@ -1,7 +1,9 @@
+from datetime import datetime
 from sqlite3 import IntegrityError
 from django.core.mail import send_mail
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.views import APIView
+
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User  # Permite el registro
 # Permite crear la cookie con el registro del login
@@ -16,7 +18,8 @@ from django.contrib.auth.models import User
 import secrets
 import string
 # Importación de los modelos
-from .models import Moneda, Categoria, Tarjeta, MetodoPago, Transaccion, TipoTransaccion
+from django.db.models import Q
+from .models import Moneda, Categoria, Tarjeta, MetodoPago, Transaccion, TipoTransaccion, Ahorro, MetaFinanciera, Pago
 
 # Create your views here.
 
@@ -135,7 +138,13 @@ class Movimientos (APIView):
     template_name = "movimientos.html"
 
     def get(self, request):
-        return render(request, self.template_name)
+        fecha_inicio = '2023-01-01'  # Define tu fecha de inicio
+        fecha_fin = '2023-12-31'  # Define tu fecha de fin
+
+        transacciones_entre_fechas = Transaccion.objects.filter(
+            Q(fecha__gte=fecha_inicio) & Q(fecha__lte=fecha_fin)
+        )
+        return render(request, self.template_name,{'transacciones':transacciones_entre_fechas})
 
     def post(self, request):
         return render(request, self.template_name)
@@ -144,115 +153,571 @@ class Movimientos (APIView):
 @method_decorator(login_required, name='dispatch')
 class Ingresos (APIView):
     template_name = "ingresos.html"
-
+    # MÉTODO GET
     def get(self, request):
+        # mensajeError, error, mostrarMensaje, mensaje
+        context = self.get_context_data('none', '', 'none', '')
+        return render(request, self.template_name, context)
+        
+   # MÉTODO POST
+    def post(self, request):
+        #Comprueba que estén los datos requeridos.
+        
+        if self.verifica() == False:
+            context = self.get_context_data('block', 'Todos los campos son obligatorios.', 'none', '')
+            return render(request, self.template_name, context)
+        else:
+            # OBTTENER LOS DATOS POR POST
+            categoriaF = request.POST['categoria']
+            montoF = request.POST['monto']
+            fechaF = request.POST['fecha']
+            monedaF = request.POST['moneda']
+            metodoPagoF = request.POST['metodoPago']
+            notaF = request.POST['nota']
+            
+            if metodoPagoF == 'MP-EFEC':
+                metodo = request.POST['efectivoSel']
+            elif metodoPagoF == 'MP-TARJ':
+                metodo = request.POST['tarjetaSel']
+            else:
+                context = self.get_context_data('block', 'El método de pago no es válido', 'none', '')
+                return render(request, self.template_name, context)
+            
+            # GENERACIÓN DE ID DE TRANSACCIÓN (INGRESO)
+            current_time = datetime.now()
+            usuario = request.user
+            usuario_id = usuario.id
+            fecha = f"I{usuario_id}-{current_time.strftime('%Y%m%d%H%M%S')}"
+            transaction_id = str(fecha)
+            try:
+                nuevaTransaccion = Transaccion(id_transaccion=transaction_id,
+                                               descripcion=notaF,
+                                               monto=montoF,
+                                               fecha=fechaF,
+                                               fk_cuenta=Tarjeta.objects.get(id_cuenta=metodo),
+                                               fk_moneda=Moneda.objects.get(id_moneda=monedaF),
+                                               fk_tipo=TipoTransaccion.objects.get(id_tipo='TP-ING'),
+                                               fk_usuario=usuario,
+                                               fkcategoria=Categoria.objects.get(id_categoria=categoriaF)
+                )
+                nuevaTransaccion.save()
+                context = self.get_context_data('none', '', 'block', 'Los datos se han registrado correctamente.')
+                return render(request, self.template_name, context)
+            except IntegrityError:
+                context = self.get_context_data('block', 'Error, se presentó una duplicación de datos', 'none', '')
+                return render(request, self.template_name, context)
+            except Exception as e:
+                context = self.get_context_data('block', f"Los datos ingresados no son válidos: {str(e)}", 'none', '')
+                return render(request, self.template_name, context)
+    
+    # Realiza las consultas y renderiza en los campos
+    def get_context_data(self, mensajeError, error, mostrarMensaje, mensaje):
+         # Obtiene el usuairo y su ID
+        usuario = self.request.user
+        usuario_id = usuario.id
+        
         # Consulta las monedas registradas en la BD
         monedas = Moneda.objects.all()
         # Consultas para ingresos
         categorias = Categoria.objects.filter(fk_tipo='TP-ING')
-        return render(request, self.template_name, {'monedas': monedas,
-                                                    'categorias': categorias})
-
-    def post(self, request):
-        cantidad = request.POST['cantidad']
-        if cantidad is None:
-            return render(request, self.template_name, {'error': 'Todos los campos son obligatorios'})
-        else:
-            try:
-                #cuenta = Cuenta.objects.get(id_cuenta='12358432547554')
-                nuevaTransaccion = Transaccion(id_transaccion='123123',
-                                       fk_usuario=User.objects.get(id='2'),
-                                       fk_cuenta=Cuenta.objects.get(id_cuenta='12358432547554'),
-                                       fkcategoria=Categoria.objects.get(id_categoria='CAT-01'),
-                                       fk_tipo=TipoTransaccion.objects.get(id_tipo='TP-ING'),
-                                       descripcion='Ejemplo de ingreso',
-                                       monto='350',
-                                       fecha='2023-10-10',
-                                       fk_moneda=Moneda.objects.get(id_moneda='MXN')
-                )
-                nuevaTransaccion.save()
-                return render(request, self.template_name)
-            except IntegrityError:
-                return render(request, self.template_name, {'error': 'Hubo un problema al agregar la cuenta'})
         
+        # Consulta para retornar las carteras del usuario.
+        carteras = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-EFEC',
+            fk_usuario=usuario_id
+        )
+        
+        # Consulta para retornar las tarjetas del usuario.
+        tarjetas = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-TARJ',
+            fk_usuario=usuario_id
+        )
+        return {
+            'monedas': monedas,
+            'categorias': categorias,
+            'carteras': carteras,
+            'tarjetas': tarjetas,
+            'mostrarError': mensajeError,
+            'error': error,
+            'mostrarMensaje': mostrarMensaje,
+            'mensaje': mensaje,
+        }
 
+    def verifica(self):
+        if ('categoria' not in self.request.POST or 
+            'monto' not in self.request.POST or
+            'fecha' not in self.request.POST or
+            'moneda' not in self.request.POST or
+            'metodoPago' not in self.request.POST or
+            'nota' not in self.request.POST or
+            'efectivoSel' not in self.request.POST or
+            'tarjetaSel' not in self.request.POST
+            ):
+            return False
+        else:
+            return True
+        
+    def get_context_data(self, mensajeError, error, mostrarMensaje, mensaje):
+         # Obtiene el usuairo y su ID
+        usuario = self.request.user
+        usuario_id = usuario.id
+        
+        # Consulta las monedas registradas en la BD
+        monedas = Moneda.objects.all()
+        # Consultas para ingresos
+        categorias = Categoria.objects.filter(fk_tipo='TP-ING')
+        
+        # Consulta para retornar las carteras del usuario.
+        carteras = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-EFEC',
+            fk_usuario=usuario_id
+        )
+        
+        # Consulta para retornar las tarjetas del usuario.
+        tarjetas = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-TARJ',
+            fk_usuario=usuario_id
+        )
+        return {
+            'monedas': monedas,
+            'categorias': categorias,
+            'carteras': carteras,
+            'tarjetas': tarjetas,
+            'mostrarError': mensajeError,
+            'error': error,
+            'mostrarMensaje': mostrarMensaje,
+            'mensaje': mensaje,
+        }
+        
+# Gastos del usuario
 @method_decorator(login_required, name='dispatch')
 class Gastos (APIView):
     template_name = "gastos.html"
 
+    # MÉTODO GET
     def get(self, request):
+        # mensajeError, error, mostrarMensaje, mensaje
+        context = self.get_context_data('none', '', 'none', '')
+        return render(request, self.template_name, context)
+        
+    # MÉTODO POST
+    def post(self, request):
+        #Comprueba que estén los datos requeridos.
+        
+        if self.verifica() == False:
+            context = self.get_context_data('block', 'Todos los campos son obligatorios.', 'none', '')
+            return render(request, self.template_name, context)
+        else:
+            # OBTTENER LOS DATOS POR POST
+            categoriaF = request.POST['categoria']
+            montoF = request.POST['monto']
+            fechaF = request.POST['fecha']
+            monedaF = request.POST['moneda']
+            metodoPagoF = request.POST['metodoPago']
+            notaF = request.POST['nota']
+            
+            if metodoPagoF == 'MP-EFEC':
+                metodo = request.POST['efectivoSel']
+            elif metodoPagoF == 'MP-TARJ':
+                metodo = request.POST['tarjetaSel']
+            else:
+                context = self.get_context_data('block', 'El método de pago no es válido', 'none', '')
+                return render(request, self.template_name, context)
+            
+            # GENERACIÓN DE ID DE TRANSACCIÓN (INGRESO)
+            current_time = datetime.now()
+            usuario = request.user
+            usuario_id = usuario.id
+            fecha = f"G{usuario_id}-{current_time.strftime('%Y%m%d%H%M%S')}"
+            transaction_id = str(fecha)
+            try:
+                nuevaTransaccion = Transaccion(id_transaccion=transaction_id,
+                                               descripcion=notaF,
+                                               monto=montoF,
+                                               fecha=fechaF,
+                                               fk_cuenta=Tarjeta.objects.get(id_cuenta=metodo),
+                                               fk_moneda=Moneda.objects.get(id_moneda=monedaF),
+                                               fk_tipo=TipoTransaccion.objects.get(id_tipo='TP-GAS'),
+                                               fk_usuario=usuario,
+                                               fkcategoria=Categoria.objects.get(id_categoria=categoriaF)
+                )
+                nuevaTransaccion.save()
+                context = self.get_context_data('none', '', 'block', 'Los datos se han registrado correctamente.')
+                return render(request, self.template_name, context)
+            except IntegrityError:
+                context = self.get_context_data('block', 'Error, se presentó una duplicación de datos', 'none', '')
+                return render(request, self.template_name, context)
+            except Exception as e:
+                context = self.get_context_data('block', f"Los datos ingresados no son válidos: {str(e)}", 'none', '')
+                return render(request, self.template_name, context)
+    
+    # Realiza las consultas y renderiza en los campos
+    def get_context_data(self, mensajeError, error, mostrarMensaje, mensaje):
+        # Obtiene el usuairo y su ID
+        usuario = self.request.user
+        usuario_id = usuario.id
+        
         # Consulta las monedas registradas en la BD
         monedas = Moneda.objects.all()
         # Consultas para ingresos
-        categorias = Categoria.objects.filter(fk_tipo=1)
+        categorias = Categoria.objects.filter(fk_tipo='TP-GAS')
+        
+        # Consulta para retornar las carteras del usuario.
+        carteras = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-EFEC',
+            fk_usuario=usuario_id
+        )
+        
+        # Consulta para retornar las tarjetas del usuario.
+        tarjetas = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-TARJ',
+            fk_usuario=usuario_id
+        )
+        return {
+            'monedas': monedas,
+            'categorias': categorias,
+            'carteras': carteras,
+            'tarjetas': tarjetas,
+            'mostrarError': mensajeError,
+            'error': error,
+            'mostrarMensaje': mostrarMensaje,
+            'mensaje': mensaje,
+        }
 
-        return render(request, self.template_name, {'monedas': monedas,
-                                                    'categorias': categorias})
+    def verifica(self):
+        if ('categoria' not in self.request.POST or 
+            'monto' not in self.request.POST or
+            'fecha' not in self.request.POST or
+            'moneda' not in self.request.POST or
+            'metodoPago' not in self.request.POST or
+            'nota' not in self.request.POST or
+            'efectivoSel' not in self.request.POST or
+            'tarjetaSel' not in self.request.POST
+            ):
+            return False
+        else:
+            return True
 
-    def post(self, request):
-        return render(request, self.template_name)
-
-
+# Ahorros del usuario
 @method_decorator(login_required, name='dispatch')
 class Ahorros (APIView):
     template_name = "ahorros.html"
 
+    # MÉTODO GET
     def get(self, request):
-        return render(request, self.template_name)
+        # mensajeError, error, mostrarMensaje, mensaje
+        context = self.get_context_data('none', '', 'none', '')
+        return render(request, self.template_name, context)
 
+    # MÉTODO POST
     def post(self, request):
-        return render(request, self.template_name)
+        #Comprueba que estén los datos requeridos.
+        if self.verifica() == False:
+            context = self.get_context_data('block', 'Todos los campos son obligatorios.', 'none', '')
+            return render(request, self.template_name, context)
+        else:
+            # OBTTENER LOS DATOS POR POST
+            montoF = request.POST['monto']
+            fechaF = request.POST['fecha']
+            #monedaF = request.POST['moneda']
+            notaF = request.POST['nota']
+            
+            # GENERACIÓN DE ID DE TRANSACCIÓN (INGRESO)
+            current_time = datetime.now()
+            usuario = request.user
+            usuario_id = usuario.id
+            fecha = f"A{usuario_id}-{current_time.strftime('%Y%m%d%H%M%S')}"
+            transaction_id = str(fecha)
+            metodoPagoF = request.POST['metodoPago']
+            user = get_object_or_404(User, id=usuario_id)  # usuario_id es el valor que deseas asignar como clave foránea
+            print("Estado del usuario ", user)
+            if metodoPagoF == 'MP-EFEC':
+                metodo = request.POST['efectivoSel']
+            elif metodoPagoF == 'MP-TARJ':
+                metodo = request.POST['tarjetaSel']
+            else:
+                context = self.get_context_data('block', 'El método de pago no es válido', 'none', '')
+                return render(request, self.template_name, context)
+            try:
+                nuevoAhorro = Ahorro(id_ahorro=transaction_id,
+                                     descripcion=notaF,
+                                     monto=montoF,
+                                     fecha=fechaF,
+                                     fk_cuenta=Tarjeta.objects.get(id_cuenta=metodo),
+                                     fk_usuario=User.objects.get(id = usuario_id),
+                                    )
+                nuevoAhorro.save()
+                context = self.get_context_data('none', '', 'block', 'Los datos se han registrado correctamente.')
+                return render(request, self.template_name, context)
+            except IntegrityError:
+                context = self.get_context_data('block', 'Error, se presentó una duplicación de datos', 'none', '')
+                return render(request, self.template_name, context)
+            except Exception as e:
+                context = self.get_context_data('block', f"Los datos ingresados no son válidos: {str(e)}", 'none', '')
+                return render(request, self.template_name, context)
+    
+    # Realiza las consultas y renderiza en los campos
+    def get_context_data(self, mensajeError, error, mostrarMensaje, mensaje):        
+        # Obtiene el usuairo y su ID
+        usuario = self.request.user
+        usuario_id = usuario.id
+        
+        # Consulta las monedas registradas en la BD
+        monedas = Moneda.objects.all()
+        # Consultas para ingresos
+        categorias = Categoria.objects.filter(fk_tipo='TP-GAS')
+        
+        # Consulta para retornar las carteras del usuario.
+        carteras = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-EFEC',
+            fk_usuario=usuario_id
+        )
+        
+        # Consulta para retornar las tarjetas del usuario.
+        tarjetas = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-TARJ',
+            fk_usuario=usuario_id
+        )
+        
+        return {
+            'monedas': monedas,
+            'categorias': categorias,
+            'carteras': carteras,
+            'tarjetas': tarjetas,
+            'mostrarError': mensajeError,
+            'error': error,
+            'mostrarMensaje': mostrarMensaje,
+            'mensaje': mensaje,
+        }
+
+    # Verifica que existan los campos del HTML
+    def verifica(self):
+        if ('fecha' not in self.request.POST or
+            'monto' not in self.request.POST or
+            #'moneda' not in self.request.POST or
+            'nota' not in self.request.POST or
+            'metodoPago' not in self.request.POST or
+            'nota' not in self.request.POST or
+            'efectivoSel' not in self.request.POST or
+            'tarjetaSel' not in self.request.POST
+            ):
+            return False
+        else:
+            return True
 
 
 @method_decorator(login_required, name='dispatch')
 class DeudasPagos (APIView):
     template_name = "deudasypagos.html"
 
+    # MÉTODO GET
     def get(self, request):
-        return render(request, self.template_name)
+        context = self.get_context_data('none', '', 'none', '')
+        return render(request, self.template_name, context)
 
+    # MÉTODO POST
     def post(self, request):
-        return render(request, self.template_name)
+        #Comprueba que estén los datos requeridos.
+        if self.verifica() == False:
+            context = self.get_context_data('block', 'Todos los campos son obligatorios.', 'none', '')
+            return render(request, self.template_name, context)
+        else:
+            # OBTTENER LOS DATOS POR POST
+            montoF = request.POST['monto']
+            fechaF = request.POST['fecha']
+            #monedaF = request.POST['moneda']
+            notaF = request.POST['nota']
+            
+            # GENERACIÓN DE ID DE TRANSACCIÓN (INGRESO)
+            current_time = datetime.now()
+            usuario = request.user
+            usuario_id = usuario.id
+            fecha = f"A{usuario_id}-{current_time.strftime('%Y%m%d%H%M%S')}"
+            transaction_id = str(fecha)
+            metodoPagoF = request.POST['metodoPago']
+            user = get_object_or_404(User, id=usuario_id)  # usuario_id es el valor que deseas asignar como clave foránea
+            print("Estado del usuario ", user)
+            if metodoPagoF == 'MP-EFEC':
+                metodo = request.POST['efectivoSel']
+            elif metodoPagoF == 'MP-TARJ':
+                metodo = request.POST['tarjetaSel']
+            else:
+                context = self.get_context_data('block', 'El método de pago no es válido', 'none', '')
+                return render(request, self.template_name, context)
+            try:
+                nuevoPago = Pago(id_ahorro=transaction_id,
+                                     descripcion=notaF,
+                                     monto=montoF,
+                                     fecha=fechaF,
+                                     fk_cuenta=Tarjeta.objects.get(id_cuenta=metodo),
+                                     fk_usuario=User.objects.get(id = usuario_id),
+                                    )
+                nuevoPago.save()
+                context = self.get_context_data('none', '', 'block', 'Los datos se han registrado correctamente.')
+                return render(request, self.template_name, context)
+            except IntegrityError:
+                context = self.get_context_data('block', 'Error, se presentó una duplicación de datos', 'none', '')
+                return render(request, self.template_name, context)
+            except Exception as e:
+                context = self.get_context_data('block', f"Los datos ingresados no son válidos: {str(e)}", 'none', '')
+                return render(request, self.template_name, context)
+    
+    # Realiza las consultas y renderiza en los campos
+    def get_context_data(self, mensajeError, error, mostrarMensaje, mensaje):        
+        # Obtiene el usuairo y su ID
+        usuario = self.request.user
+        usuario_id = usuario.id
+        
+        # Consulta las monedas registradas en la BD
+        monedas = Moneda.objects.all()
+        # Consultas para ingresos
+        categorias = Categoria.objects.filter(fk_tipo='TP-GAS')
+        
+        # Consulta para retornar las carteras del usuario.
+        carteras = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-EFEC',
+            fk_usuario=usuario_id
+        )
+        
+        # Consulta para retornar las tarjetas del usuario.
+        tarjetas = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-TARJ',
+            fk_usuario=usuario_id
+        )
+        
+        return {
+            'monedas': monedas,
+            'categorias': categorias,
+            'carteras': carteras,
+            'tarjetas': tarjetas,
+            'mostrarError': mensajeError,
+            'error': error,
+            'mostrarMensaje': mostrarMensaje,
+            'mensaje': mensaje,
+        }
 
+    # Verifica que existan los campos del HTML
+    def verifica(self):
+        if ('fecha' not in self.request.POST or
+            'monto' not in self.request.POST or
+            'moneda' not in self.request.POST or
+            'nota' not in self.request.POST or
+            'metodoPago' not in self.request.POST or
+            'nota' not in self.request.POST or
+            'efectivoSel' not in self.request.POST or
+            'tarjetaSel' not in self.request.POST
+            ):
+            return False
+        else:
+            return True
 
 @method_decorator(login_required, name='dispatch')
 class Tarjetas(APIView):
     template_name = "Tarjetas.html"
-
     def get(self, request):
-        return render(request, self.template_name)
+        return render(request, self.template_name, {'mostrarError':'none',
+                                                    'mostrarMensaje':'none',
+                                                    'error':'Hola'})
 
     def post(self, request):
+        usuario = request.user  # Obtiene al usuario loggeado
         numero = request.POST.get('numero')
         nombre = request.POST.get('nombre')
         tipo = request.POST.get('tipo')
-        usuario = User.objects.get(id=2)
 
         # Comprobar que no vengan datos vacíos
-        if not numero or not nombre or not tipo:
-            return render(request, self.template_name, {'error': 'Todos los campos son obligatorios'})
+        if numero is None or nombre is None or request.POST.get('tipo') is None:
+            return render(request, self.template_name, {'mostrarError':'block',
+                                                        "error": 'Todos los campos son obligatorios.'
+                                                        })
         else:
             try:
                 tipo_pago = MetodoPago.objects.get(id_metodotipo=tipo)
                 nuevaCuenta = Tarjeta(id_cuenta=numero,
-                                    nombre_cuenta=nombre,
-                                    fk_metodo_pago=tipo_pago,
-                                    fk_usuario=usuario)
-                nuevaCuenta.save()  # Save the new Cuenta object to the database
-                return render(request, self.template_name)  # Página de éxito
+                                      nombre_cuenta=nombre,
+                                      fk_metodo_pago=tipo_pago,
+                                      fk_usuario=usuario)
+                nuevaCuenta.save()  # Guarda el nuevo objeto Tarjeta en la base de datos
+                return render(request, self.template_name, {'mostrarMensaje':'block',
+                                                            'mensaje':'Se ha completado el registro exitosamente.'
+                    })  # Página de éxito
             except IntegrityError:
-                return render(request, self.template_name, {'error': 'Hubo un problema al agregar la cuenta'})
+                mensaje_error = 'Esta cuenta ya ha sido registrada previamente'
+                print(mensaje_error)  # Agrega esto para verificar que se alcanza esta sección
+                return render(request, self.template_name, {'mostrar': 'block', 'error': mensaje_error})
+            except Exception as e:
+                mensaje_error = f"Los datos ingresados no son válidos: {str(e)}"
+                return render(request, self.template_name, {'mostrar':'block',
+                                                            'error': mensaje_error})
 
 
 @method_decorator(login_required, name='dispatch')
 class Metas (APIView):
     template_name = "metas.html"
 
+    # MÉTODO GET
     def get(self, request):
-        return render(request, self.template_name)
+        # mensajeError, error, mostrarMensaje, mensaje
+        context = self.get_context_data('none', '', 'none', '')
+        return render(request, self.template_name, context)
 
+    # MÉTODO POST
     def post(self, request):
-        return render(request, self.template_name)
+        #Comprueba que estén los datos requeridos.
+        if self.verifica() == False:
+            context = self.get_context_data('block', 'Todos los campos son obligatorios.', 'none', '')
+            return render(request, self.template_name, context)
+        else:
+            # OBTTENER LOS DATOS POR POST
+            objetivoF = request.POST['objetivo']
+            fechaInicioF = request.POST['fechaInicio']
+            fechaTerminoF = request.POST['fechaTermino']
+            notaF = request.POST['nota']
+            
+            # GENERACIÓN DE ID DE TRANSACCIÓN (INGRESO)
+            current_time = datetime.now()
+            usuario = request.user
+            usuario_id = usuario.id
+            fecha = f"A{usuario_id}-{current_time.strftime('%Y%m%d%H%M%S')}"
+            transaction_id = str(fecha)
+            
+            try:
+                nuevaMeta = MetaFinanciera(id_meta=transaction_id,
+                                     descripcion=notaF,
+                                     objetivo=objetivoF,
+                                     fechaInicio=fechaInicioF,
+                                     fechaTermino=fechaTerminoF,
+                                     fk_usuario=User.objects.get(id = usuario_id),
+                                    )
+                nuevaMeta.save()
+                context = self.get_context_data('none', '', 'block', 'Los datos se han registrado correctamente.')
+                return render(request, self.template_name, context)
+            except IntegrityError:
+                context = self.get_context_data('block', 'Error, se presentó una duplicación de datos', 'none', '')
+                return render(request, self.template_name, context)
+            except Exception as e:
+                context = self.get_context_data('block', f"Los datos ingresados no son válidos: {str(e)}", 'none', '')
+                return render(request, self.template_name, context)
+    
+    # Realiza las consultas y renderiza en los campos
+    def get_context_data(self, mensajeError, error, mostrarMensaje, mensaje):
+        return {
+            'mostrarError': mensajeError,
+            'error': error,
+            'mostrarMensaje': mostrarMensaje,
+            'mensaje': mensaje,
+        }
+    
+    # Verifica que se envíen los datos requeridos por POST
+    def verifica(self):
+        if ('objetivo' not in self.request.POST or
+            'fechaInicio' not in self.request.POST or
+            'fechaTermino' not in self.request.POST or
+            'nota' not in self.request.POST
+            ):
+            return False
+        else:
+            return True
 
 
 def Reestablecer(request):

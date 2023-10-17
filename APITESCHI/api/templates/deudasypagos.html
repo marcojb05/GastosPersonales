@@ -62,6 +62,21 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{% static 'assets/js/config.js'%}"></script>
+    <script>
+      function mostrarSelect() {
+        var radioSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
+        var selectEfectivo = document.getElementById('efectivoSel');
+        var selectTarjeta = document.getElementById('tarjetaSel');
+
+        if (radioSeleccionado && radioSeleccionado.value === 'MP-EFEC') {
+          selectEfectivo.style.display = 'block';  // Mostrar el select
+          selectTarjeta.style.display = 'none';  // Mostrar el select
+        } else if (radioSeleccionado && radioSeleccionado.value === 'MP-TARJ') {
+          selectEfectivo.style.display = 'none';  // Mostrar el select
+          selectTarjeta.style.display = 'block';  // Mostrar el select
+        }
+      }
+    </script>
   </head>
 
   <body>
@@ -172,7 +187,7 @@
                 </li>
                 <li class="menu-item">
                   <a href="{% url 'ahorros'%}" class="menu-link">
-                    <div data-i18n="Container">Ahorrros</div>
+                    <div data-i18n="Container">Ahorros</div>
                   </a>
                 </li>
                 <li class="menu-item active">
@@ -347,11 +362,15 @@
                         <h5 class="mb-0">Registro de gastos</h5>
                       </div>
                       <div class="card-body">
-                        <form>
+                        <form class="mb-3" action="/deudasypagos/" method="POST">
+                          {% csrf_token %}
                           <div class="mb-3">
                             <label class="form-label" for="fecha">Fecha:</label>
                             <div class="form-control">
-                              <input class="form-control" type="date" value="2021-06-18" id="fecha" />
+                              <input class="form-control"
+                                type="date"
+                                id="fecha"
+                                required />
                             </div>
                           </div>
                           <div class="mb-3">
@@ -363,6 +382,7 @@
                                 type="radio"
                                 value=""
                                 id="unico"
+                                required
                               />
                               <label class="form-check-label" for="unico"> Único </label>
                             </div>
@@ -373,6 +393,7 @@
                                 type="radio"
                                 value=""
                                 id="diario"
+                                required
                               />
                               <label class="form-check-label" for="diario"> Diario </label>
                             </div>
@@ -383,6 +404,7 @@
                                 type="radio"
                                 value=""
                                 id="semanal"
+                                required
                               />
                               <label class="form-check-label" for="semanal"> Semanal </label>
                             </div>
@@ -393,6 +415,7 @@
                                 type="radio"
                                 value=""
                                 id="quincenal"
+                                required
                               />
                               <label class="form-check-label" for="quincenal"> Quincenal </label>
                             </div>
@@ -403,6 +426,7 @@
                                 type="radio"
                                 value=""
                                 id="mensual"
+                                required
                               />
                               <label class="form-check-label" for="mensual"> Mensual </label>
                             </div>
@@ -410,79 +434,107 @@
                           <div class="mb-3">
                             <label class="form-label" for="fechaLimite">Fecha límite:</label>
                             <div class="form-control">
-                              <input class="form-control" type="date" value="2021-06-18" id="fechaLimite" />
+                              <input class="form-control"
+                                type="date"
+                                id="fechaLimite"
+                                name="fechaLimite"
+                                required />
                             </div>
                           </div>
                           <div class="mb-3">
-                            <label class="form-label" for="cantidad">Cantidad</label>
+                            <label class="form-label" for="monto">Monto:</label>
                             <div class="input-group">
                               <span class="input-group-text">$</span>
                               <input
                                 type="number"
                                 min="0"
                                 class="form-control"
-                                placeholder="Cantidad"
-                                id="cantidad"
-                                aria-label="Amount (to the nearest dollar)"
+                                placeholder="Monto"
+                                id="monto"
+                                name="monto"
+                                aria-label="Monto"
+                                required
                               />
                             </div>
                           </div>
+                          {% comment %} SELECCIÓN DE MONEDA {% endcomment %}
                           <div class="mb-3">
                             <label class="form-label" for="moneda">Moneda:</label>
                             <div class="input-group input-group-merge">
                               <span class="input-group-text"><i class='bx bx-category'></i></span>
                               <select class="form-select" id="moneda" aria-label="Selecciona el tipo de moneda">
                                 <option selected>Selecciona el tipo de moneda</option>
-                                <option value="1">MXN</option>
-                                <option value="2">USD</option>
-                                <option value="3">EUR</option>
+                                {% for moneda in monedas %}
+                                    <option value="{{ moneda.id_moneda }}">{{ moneda.id_moneda }} - {{ moneda.nombre_moneda }}</option>
+                                {% endfor %}
                               </select>
                             </div>
                           </div>
+                          {% comment %} SELECCIÓN DE CATEGORÍA {% endcomment %}
                           <div class="mb-3">
                             <label class="form-label" for="categoria">Categoría</label>
                             <div class="input-group input-group-merge">
                               <span class="input-group-text"><i class='bx bx-category'></i></span>
-                              <select class="form-select" id="categoria" aria-label="Selecciona una categoría">
-                                <option selected>Selecciona una categoría</option>
-                                <option value="1">Comida</option>
-                                <option value="2">Transporte</option>
-                                <option value="3">Educación</option>
+                              <select class="form-select"
+                                id="categoria"
+                                name="categoria"
+                                aria-label="Selecciona una categoría"
+                                required >
+                                <option selected value="">Selecciona una categoría</option>
+                                {% for categoria in categorias %}
+                                  <option value="{{ categoria.id_categoria}}">{{ categoria.nombre}}</option>
+                                {% endfor %}
                               </select>
                             </div>
                             <div class="form-text">Selecciona una categoría correspondiente al gasto.</div>
                           </div>
+                          {% comment %} SELECCIÓN DE MÉTODO {% endcomment %}
                           <div class="mb-3">
-                            <label class="form-label" for="metodoPago">Método de pago:</label>
+                            {% comment %} EFECTIVO {% endcomment %}
+                            <label class="form-label">Método:</label>
                             <div class="form-check mt-2">
                               <input
                                 name="metodoPago"
                                 class="form-check-input"
                                 type="radio"
-                                value=""
+                                value="MP-EFEC"
                                 id="efectivo"
+                                onchange="mostrarSelect()"
+                                checked
+                                required
                               />
                               <label class="form-check-label" for="efectivo"> Efectivo </label>
+                              <select class="form-select"
+                                id="efectivoSel"
+                                name="efectivoSel"
+                                required
+                                style="display: block;">
+                                {% for cartera in carteras %}
+                                  <option value="{{ cartera.id_cuenta}}">{{ cartera.nombre_cuenta }}</option>
+                                {% endfor %}
+                              </select>
                             </div>
+                            {% comment %} TARJETA {% endcomment %}
                             <div class="form-check mt-2">
                               <input
                                 name="metodoPago"
                                 class="form-check-input"
                                 type="radio"
-                                value=""
+                                value="MP-TARJ"
                                 id="tarjeta"
+                                onchange="mostrarSelect()"
+                                required
                               />
                               <label class="form-check-label" for="tarjeta"> Tarjeta </label>
-                            </div>
-                            <div class="form-check mt-2">
-                              <input
-                                name="metodoPago"
-                                class="form-check-input"
-                                type="radio"
-                                value=""
-                                id="cuentas"
-                              />
-                              <label class="form-check-label" for="cuentas"> Cuentas </label>
+                              <select class="form-select"
+                                id="tarjetaSel"
+                                name="tarjetaSel"
+                                style="display: none;"
+                                required>
+                                {% for tarjeta in tarjetas %}
+                                  <option value="{{ tarjeta.id_cuenta }}">{{ tarjeta.nombre_cuenta }}</option>
+                                {% endfor %}
+                              </select>
                             </div>
                           </div>
                           <div class="mb-3">

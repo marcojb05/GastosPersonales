@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
         
-# Modelo de métodos de pago
+# Modelo de tipo de transacción
 class TipoTransaccion(models.Model):
     id_tipo = models.CharField(primary_key=True, max_length=10, db_column='id_tipo')
     tipo_transaccion = models.CharField(max_length=255)
@@ -36,7 +36,7 @@ class Tarjeta(models.Model):
 # Modelo de ahorros
 class Ahorro(models.Model):
     id_ahorro = models.CharField(primary_key=True, max_length=10, db_column='id_ahorro')
-    fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=None, db_column='fk_usuario')
+    fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1, db_column='fk_usuario')
     fk_cuenta = models.ForeignKey(Tarjeta, on_delete=models.CASCADE, default=1, db_column='fk_cuenta')
     descripcion = models.TextField()
     monto = models.DecimalField(max_digits=10, decimal_places=2)
@@ -78,7 +78,7 @@ class Moneda(models.Model):
 
 # Modelo de transacciones
 class Transaccion(models.Model):
-    id_transaccion = models.CharField(primary_key=True, max_length=15, db_column='id_transaccion')
+    id_transaccion = models.CharField(primary_key=True, max_length=20, db_column='id_transaccion')
     fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=None, db_column='fk_usuario')
     fk_cuenta = models.ForeignKey(Tarjeta, on_delete=models.CASCADE, default=None, db_column='fk_cuenta')
     fkcategoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, default=None, db_column='fkcategoria')

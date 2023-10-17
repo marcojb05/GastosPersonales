@@ -346,8 +346,15 @@
                         <h5 class="mb-0">Registro de tarjetas</h5>
                       </div>
                       <div class="card-body">
-                        <form id="cuenta" class="mb-3" action="{% url 'tarjetas'%}" method="POST">
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="display: {{mostrarError}};">
                           {{error}}
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div class="alert alert-success alert-dismissible" role="alert" style="display: {{mostrarMensaje}};">
+                          {{mensaje}}
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <form id="tarjetas" class="mb-3" action="{% url 'tarjetas'%}" method="POST">
                           {% csrf_token %}
                           <div class="mb-3">
                             <label class="form-label" for="numero">Número de tarjeta/tarjeta</label>
@@ -366,18 +373,6 @@
                               />
                             </div>
                           </div>
-                          <!--<div class="mb-3">
-                            <label class="form-label" for="banco">Banco:</label>
-                            <div class="input-group input-group-merge">
-                              <span class="input-group-text"><i class='bx bxs-bank'></i></span>
-                              <select class="form-select" id="banco" aria-label="Default select example">
-                                <option selected>Selecciona el banco</option>
-                                <option value="1">Azteca</option>
-                                <option value="2">BANAMEX</option>
-                                <option value="3">BBVA</option>
-                              </select>
-                            </div>
-                          </div>-->
                           <div class="mb-3">
                             <label class="form-label" for="nombre">Nombre de la cuenta/tarjeta</label>
                             <div class="input-group">
@@ -566,5 +561,6 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>  <!-- Para las alertas -->
   </body>
 </html>

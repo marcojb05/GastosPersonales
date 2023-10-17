@@ -62,6 +62,21 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{%static 'assets/js/config.js'%}"></script>
+    <script>
+      function mostrarSelect() {
+        var radioSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
+        var selectEfectivo = document.getElementById('efectivoSel');
+        var selectTarjeta = document.getElementById('tarjetaSel');
+
+        if (radioSeleccionado && radioSeleccionado.value === 'MP-EFEC') {
+          selectEfectivo.style.display = 'block';  // Mostrar el select
+          selectTarjeta.style.display = 'none';  // Mostrar el select
+        } else if (radioSeleccionado && radioSeleccionado.value === 'MP-TARJ') {
+          selectEfectivo.style.display = 'none';  // Mostrar el select
+          selectTarjeta.style.display = 'block';  // Mostrar el select
+        }
+      }
+    </script>
   </head>
 
   <body>
@@ -165,14 +180,14 @@
                     <div data-i18n="Without navbar">Ingresos</div>
                   </a>
                 </li>
-                <li class="menu-item active">
+                <li class="menu-item">
                   <a href="{% url 'gastos'%}" class="menu-link">
                     <div data-i18n="Without navbar">Gastos</div>
                   </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item active">
                   <a href="{% url 'ahorros'%}" class="menu-link">
-                    <div data-i18n="Container">Ahorrros</div>
+                    <div data-i18n="Container">Ahorros</div>
                   </a>
                 </li>
                 <li class="menu-item">
@@ -346,37 +361,106 @@
                       <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Registro de ahorros</h5>
                       </div>
+                      <div class="alert alert-danger alert-dismissible" id="alerta"
+                        role="alert" style="display: {{ mostrarError }};">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                        <div id="mensaje" class="alert alert-success alert-dismissible"
+                          role="alert" style="display: {{ mostrarMensaje }};">
+                        {{ mensaje }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
                       <div class="card-body">
-                        <form>
+                        <form class="mb-3" action="/ahorros/" method="POST">
+                          {% csrf_token %}
                           <div class="mb-3">
                             <label class="form-label" for="fecha">Fecha:</label>
                             <div class="form-control">
-                              <input class="form-control" type="date" value="2021-06-18" id="fecha" />
+                              <input class="form-control"
+                                type="date"
+                                id="fecha"
+                                name="fecha"
+                                required />
                             </div>
                           </div>
                           <div class="mb-3">
-                            <label class="form-label" for="cantidad">Cantidad</label>
+                            <label class="form-label" for="monto">Monto</label>
                             <div class="input-group">
                               <span class="input-group-text">$</span>
                               <input
                                 type="number"
                                 min="0"
                                 class="form-control"
-                                placeholder="Cantidad"
-                                aria-label="Amount (to the nearest dollar)"
-                                id="cantidad"
+                                placeholder="Monto"
+                                aria-label="Monto"
+                                id="monto"
+                                name="monto"
+                                required
                               />
                             </div>
                           </div>
-                          <div class="mb-3">
+                          {% comment %} <div class="mb-3">
                             <label class="form-label" for="moneda">Moneda:</label>
                             <div class="input-group input-group-merge">
                               <span class="input-group-text"><i class='bx bx-category'></i></span>
-                              <select class="form-select" id="moneda" aria-label="Seleccina el tipo de moneda">
-                                <option selected>Selecciona el tipo de moneda</option>
-                                <option value="1">MXN</option>
-                                <option value="2">USD</option>
-                                <option value="3">EUR</option>
+                              <select class="form-select"
+                                id="moneda"
+                                name="moneda"
+                                aria-label="Seleccina el tipo de moneda"
+                                required>
+                                <option selected value="">Selecciona el tipo de moneda</option>
+                                {% for moneda in monedas %}
+                                    <option value="{{ moneda.id_moneda }}">{{ moneda.id_moneda }} - {{ moneda.nombre_moneda }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div> {% endcomment %}
+                          <div class="mb-3">
+                            {% comment %} EFECTIVO {% endcomment %}
+                            <label class="form-label">Método:</label>
+                            <div class="form-check mt-2">
+                              <input
+                                name="metodoPago"
+                                class="form-check-input"
+                                type="radio"
+                                value="MP-EFEC"
+                                id="efectivo"
+                                onchange="mostrarSelect()"
+                                checked
+                                required
+                              />
+                              <label class="form-check-label" for="efectivo"> Efectivo </label>
+                              <select class="form-select"
+                                id="efectivoSel"
+                                name="efectivoSel"
+                                required
+                                style="display: block;">
+                                {% for cartera in carteras %}
+                                  <option value="{{ cartera.id_cuenta}}">{{ cartera.nombre_cuenta }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            {% comment %} TARJETA {% endcomment %}
+                            <div class="form-check mt-2">
+                              <input
+                                name="metodoPago"
+                                class="form-check-input"
+                                type="radio"
+                                value="MP-TARJ"
+                                id="tarjeta"
+                                onchange="mostrarSelect()"
+                                required
+                              />
+                              <label class="form-check-label" for="tarjeta"> Tarjeta </label>
+                              <select class="form-select"
+                                id="tarjetaSel"
+                                name="tarjetaSel"
+                                style="display: none;"
+                                required>
+                                {% for tarjeta in tarjetas %}
+                                  <option value="{{ tarjeta.id_cuenta }}">{{ tarjeta.nombre_cuenta }}</option>
+                                {% endfor %}
                               </select>
                             </div>
                           </div>
@@ -387,11 +471,13 @@
                                 ><i class="bx bx-comment"></i
                               ></span>
                               <textarea
-                                id="basic-icon-default-message"
+                                id="nota"
+                                name="nota"
                                 class="form-control"
                                 placeholder="Notas del Ahorro"
                                 aria-label="Notas del Ahorro"
                                 aria-describedby="basic-icon-default-message2"
+                                required
                               ></textarea>
                             </div>
                           </div>

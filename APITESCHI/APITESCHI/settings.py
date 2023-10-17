@@ -132,3 +132,13 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'antonio2552001@gmail.com'
 EMAIL_HOST_PASSWORD = 'tcsj qova zdml elzr'
+
+# CIERRE DE SESIÓN POR INACTIVIDAD
+# Configura el motor de almacenamiento de sesión
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+# Configura el tiempo de expiración de la sesión en segundos (Ahorita 15 minutos)
+SESSION_COOKIE_AGE = 600
+
+# Cada que el usuario hace una solicitud al servidor el tiempo de la sesion se reinicia
+SESSION_SAVE_EVERY_REQUEST = True

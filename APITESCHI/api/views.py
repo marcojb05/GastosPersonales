@@ -151,22 +151,24 @@ class Movimientos (APIView):
         fechaFin = ultimoDia
         
         if self.verifica:
-            context = self.get_context_data(fechaInicio, fechaFin, '', '')
+            context = self.get_context_data(fechaInicio, fechaFin, 'none', '')
             return render(request, self.template_name, context)
         else:
-            
+            context = self.get_context_data('', '', 'block', 'Todos los campos son obligatorios.')
             return render(request, self.template_name, context)
             
 
     def post(self, request):
         if self.verifica:
             try:
-                fechaInicio = request.POST['fechaInicio']
-                fechaFin = request.POST['fechaFin']
-                context = self.get_context_data(fechaInicio, fechaFin, 'none', '')
+                fechaInicioF = request.POST['fechaInicial']
+                print("Fecha Inicio: ", fechaInicioF)
+                fechaFinF = request.POST['fechaFinal']
+                print("Fecha final: ", fechaFinF)
+                context = self.get_context_data(fechaInicioF, fechaFinF, 'none', '')
                 return render(request, self.template_name, context)
             except Exception as e:
-                context = self.get_context_data('','','block', f"Los datos ingresados no son válidos: {str(e)}", 'none', '')
+                context = self.get_context_data('','','block', f"Los datos ingresados no son válidos: {str(e)}")
                 return render(request, self.template_name, context)
                 
         else:
@@ -174,7 +176,8 @@ class Movimientos (APIView):
             return render(request, self.template_name, context)
     
     def verifica(self):
-        if 'fechaInicial' is not self.request.POST or 'fechaFinal' is not self.request.POST:
+        if ('fechaInicial' not in self.request.POST or 
+            'fechaFinal' not in self.request.POST):
             return False
         else:
             return True
@@ -190,7 +193,9 @@ class Movimientos (APIView):
             fk_usuario=usuario_id
         )
         return {
-            'transacciones': transacciones_entre_fechas
+            'transacciones': transacciones_entre_fechas,
+            'mostrarError': mostrarError,
+            'error': error
         }
 
 # Ingresos del usuario

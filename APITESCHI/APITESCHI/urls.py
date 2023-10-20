@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from api.views import Home, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, tabla_html
+from api.views import Home, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, tabla_html, dashboard
 from api import views
 from django.views.generic.base import RedirectView
 
@@ -45,4 +45,5 @@ urlpatterns = [
     path('deudasypagos/', DeudasPagos.as_view(), name="deudasypagos"),
     path('tarjetas/', Tarjetas.as_view(), name="tarjetas"),
     path('metas/', Metas.as_view(), name="metas"),
+    path('dashboard/', dashboard.as_view(), name="dashboard"),
 ]

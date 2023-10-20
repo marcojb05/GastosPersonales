@@ -11,7 +11,7 @@ class TipoTransaccion(models.Model):
 
 # Modelo de métodos de pago
 class MetodoPago(models.Model):
-    id_metodotipo = models.CharField(primary_key=True, max_length=5, db_column='id_metodotipo')
+    id_metodotipo = models.CharField(primary_key=True, max_length=7, db_column='id_metodotipo')
     nombre_metodo = models.CharField(max_length=255)
     class Meta:
         db_table='MetodoPago'
@@ -35,7 +35,7 @@ class Tarjeta(models.Model):
 
 # Modelo de ahorros
 class Ahorro(models.Model):
-    id_ahorro = models.CharField(primary_key=True, max_length=10, db_column='id_ahorro')
+    id_ahorro = models.CharField(primary_key=True, max_length=20, db_column='id_ahorro')
     fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1, db_column='fk_usuario')
     fk_cuenta = models.ForeignKey(Tarjeta, on_delete=models.CASCADE, default=1, db_column='fk_cuenta')
     descripcion = models.TextField()
@@ -46,7 +46,7 @@ class Ahorro(models.Model):
 
 # Modelo de pagos
 class Pago(models.Model):
-    id_pago = models.CharField(primary_key=True, max_length=10, db_column='id_pago')
+    id_pago = models.CharField(primary_key=True, max_length=20, db_column='id_pago')
     fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=None, db_column='fk_usuario')
     nombre_deuda = models.CharField(max_length=255)
     descripcion = models.TextField()
@@ -59,7 +59,7 @@ class Pago(models.Model):
 
 # Modelo de metas financieras
 class MetaFinanciera(models.Model):
-    id_meta = models.CharField(primary_key=True, max_length=10, db_column='id_meta')
+    id_meta = models.CharField(primary_key=True, max_length=20, db_column='id_meta')
     fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=None, db_column='fk_usuario')
     descripcion = models.TextField()
     objetivo = models.DecimalField(max_digits=10, decimal_places=2)
@@ -89,3 +89,17 @@ class Transaccion(models.Model):
     fk_moneda = models.ForeignKey(Moneda, on_delete=models.CASCADE, default=None, db_column='fk_moneda')
     class Meta:
         db_table='Transaccion'
+        
+class encuesta(models.Model):
+	pregunta1 = models.TextField(db_column='Satisfacción con el sistema')
+	pregunta2 = models.TextField(db_column='Dacilidad de uso y la amigabilidad de la interfaz')
+	pregunta3 = models.TextField(db_column='Facilidad de usar y entender')
+	pregunta4 = models.TextField(db_column='Frecuencia de problemas técnicos o errores')
+	pregunta5 = models.TextField(db_column='Adaptabilidad a necesidades específicas y requisitos comerciales')
+	pregunta6 = models.TextField(db_column='Mejoras en la eficiencia')
+	pregunta7 = models.TextField(db_column='Utilidad de informes y análisis financieros')
+	pregunta8 = models.TextField(db_column='Capacidad para manejar múltiples divisas y tasas de cambio')
+	pregunta9 = models.TextField(db_column='Interrupciones en el servicio')
+	pregunta10 = models.TextField(db_column='Perdida de datos críticos o información financiera')
+	class Meta:
+		db_table: 'encuesta'

@@ -19,8 +19,8 @@ from django.contrib.auth.models import User
 import secrets
 import string
 # Importación de los modelos
-from django.db.models import Q
-from .models import Moneda, Categoria, Tarjeta, MetodoPago, Transaccion, TipoTransaccion, Ahorro, MetaFinanciera, Pago
+from django.db.models import Q, Count
+from .models import Moneda, Categoria, Tarjeta, MetodoPago, Transaccion, TipoTransaccion, Ahorro, MetaFinanciera, Pago, encuesta
 
 # Create your views here.
 
@@ -822,5 +822,22 @@ class tabla_html(APIView):
     def get(self, request):
         return render(request, self.template_name)
 
+    def post(self, request):
+        return render(request, self.template_name)
+
+class dashboard(APIView):
+    template_name = 'dashboard.html'
+    
+    def get(self, request):
+        # Primera grafica -calificación- de barras
+        calificaciones = encuesta.objects.values('pregunta1').annotate(total=Count('pregunta1')).order_by('pregunta1')
+        print(calificaciones)
+        etiquetasPregunta1 = [calificacion['pregunta1'] for calificacion in calificaciones]
+        print("Etiquetas: ",etiquetasPregunta1)
+        valoresPregunta1 = [calificacion['total'] for calificacion in calificaciones]
+        print("Datos: ",valoresPregunta1)
+        return render(request, self.template_name,{'etiquetasPregunta1': etiquetasPregunta1,
+                                                   'valoresPregunta1': valoresPregunta1})
+    
     def post(self, request):
         return render(request, self.template_name)

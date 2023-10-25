@@ -831,6 +831,9 @@ class dashboard(APIView):
     def get(self, request):
         # Primera grafica -calificación- de barras
         calificaciones = encuesta.objects.values('pregunta1').annotate(total=Count('pregunta1')).order_by('pregunta1')
+        etiquetasPregunta1 = [calificacion['pregunta1'] for calificacion in calificaciones]
+        valoresPregunta1 = [calificacion['total'] for calificacion in calificaciones]
+        calificaciones = encuesta.objects.values('pregunta1').annotate(total=Count('pregunta1')).order_by('pregunta1')
         print(calificaciones)
         etiquetasPregunta1 = [calificacion['pregunta1'] for calificacion in calificaciones]
         print("Etiquetas: ",etiquetasPregunta1)

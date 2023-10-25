@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-from google.oauth2 import service_account
+# from google.oauth2 import service_account
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'social_django',
+    # 'social_django',
 ]
 
 MIDDLEWARE = [
@@ -154,29 +154,32 @@ SESSION_COOKIE_AGE = 1500
 # Cada que el usuario hace una solicitud al servidor el tiempo de la sesion se reinicia
 SESSION_SAVE_EVERY_REQUEST = True
 
+# API OPEN EXCHANGE RATE
+OPEN_EXCHANGE_RATES_API_KEY = '051f01d6b07d4ea5997f2a21d8c4c14f'
+
 # CONEXIÓN CON GOOGLE CALENDAR
 # GOOGLE_CALENDAR_CREDENTIALS = os.path.join(settings.BASE_DIR, './APITESCHI/credentials.json')
 # GOOGLE_CALENDAR_SCOPES = ['https://www.googleapis.com/auth/calendar']
 # GOOGLE_CALENDAR_SERVICE = service_account.Credentials.from_service_account_file(
 #     GOOGLE_CALENDAR_CREDENTIALS, scopes=GOOGLE_CALENDAR_SCOPES
 # )
-AUTHENTICATION_BACKENDS = (
-    'social.backends.google.GoogleOAuth2',
-    # Otros backends si los tienes
-    'django.contrib.auth.backends.ModelBackend',
-)
+# AUTHENTICATION_BACKENDS = (
+#     'social.backends.google.GoogleOAuth2',
+#     # Otros backends si los tienes
+#     'django.contrib.auth.backends.ModelBackend',
+# )
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1066329997641-sos8ehrmq7jhjue45kc5bgic0thufu16.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '84e70ab4eb8af15fb739ba3f5b20c4d25226ee26'
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CREDENTIALS_FILE = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
+# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1066329997641-sos8ehrmq7jhjue45kc5bgic0thufu16.apps.googleusercontent.com'
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '84e70ab4eb8af15fb739ba3f5b20c4d25226ee26'
+# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# CREDENTIALS_FILE = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
 
-# Cargar las credenciales desde el archivo JSON
-credentials = service_account.Credentials.from_service_account_file(
-    CREDENTIALS_FILE,
-    scopes=['https://www.googleapis.com/auth/calendar.events']
-)
-GOOGLEDRIVE_CREDENTIALS_FILE = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
+# # Cargar las credenciales desde el archivo JSON
+# credentials = service_account.Credentials.from_service_account_file(
+#     CREDENTIALS_FILE,
+#     scopes=['https://www.googleapis.com/auth/calendar.events']
+# )
+# GOOGLEDRIVE_CREDENTIALS_FILE = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
 
 # GOOGLE_DRIVE_CREDENTIALS = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
 

@@ -1,11 +1,12 @@
-from datetime import datetime
+import datetime
 import os
 from sqlite3 import IntegrityError
 from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-import google_auth_oauthlib
+import requests
+# import google_auñth_oauthlib
 from rest_framework.views import APIView
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User  # Permite el registro
@@ -26,16 +27,17 @@ from django.db.models import Q, Count
 from APITESCHI.settings import BASE_DIR
 from .models import Moneda, Categoria, Tarjeta, MetodoPago, Transaccion, TipoTransaccion, Ahorro, MetaFinanciera, Pago, encuesta
 # CONEXIÓN CON API DE GOOGLE CALENDAR
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
+# from google.oauth2 import service_account
+# from googleapiclient.discovery import build
 from django.contrib.auth import login
-from social_django.utils import load_strategy
-from social_django.strategy import DjangoStrategy
-from social_core.backends.google import GoogleOAuth2
-from social_core.exceptions import AuthException
-from google.oauth2.service_account import Credentials
+# from social_django.utils import load_strategy
+# from social_django.strategy import DjangoStrategy
+# from social_core.backends.google import GoogleOAuth2
+# from social_core.exceptions import AuthException
+# from google.oauth2.service_account import Credentials
 from django.conf import settings
 from django.http import JsonResponse
+from openexchangerate import OpenExchangeRates
 # from django_googledrive_api import GoogleDriveClient
 
 # Create your views here.
@@ -919,78 +921,78 @@ class dashboard(APIView):
     def post(self, request):
         return render(request, self.template_name)
    
-# GOOGLE CALENDAR
-def interactuar_con_google_calendar(request):
-    # Ruta al archivo JSON de credenciales que descargaste
-    archivo_de_credenciales = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
+""" # GOOGLE CALENDAR
+# def interactuar_con_google_calendar(request):
+#     # Ruta al archivo JSON de credenciales que descargaste
+#     archivo_de_credenciales = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
 
-    # Carga las credenciales desde el archivo JSON
-    credentials = service_account.Credentials.from_service_account_file(
-        archivo_de_credenciales,
-        scopes=['https://www.googleapis.com/auth/calendar']
-    )
+#     # Carga las credenciales desde el archivo JSON
+#     credentials = service_account.Credentials.from_service_account_file(
+#         archivo_de_credenciales,
+#         scopes=['https://www.googleapis.com/auth/calendar']
+#     )
 
-    # Construye el servicio de Google Calendar API
-    service = build('calendar', 'v3', credentials=credentials)
+#     # Construye el servicio de Google Calendar API
+#     service = build('calendar', 'v3', credentials=credentials)
 
-    # Ahora puedes utilizar 'service' para interactuar con la API de Google Calendar
+#     # Ahora puedes utilizar 'service' para interactuar con la API de Google Calendar
 
-    # Por ejemplo, obtener la lista de calendarios
-    calendarios = service.calendarList().list().execute()
-    print(calendarios)
-    return render(request, 'calendar.html', {'calendarios': calendarios})
+#     # Por ejemplo, obtener la lista de calendarios
+#     calendarios = service.calendarList().list().execute()
+#     print(calendarios)
+#     return render(request, 'calendar.html', {'calendarios': calendarios})
 
-def test_calendar():
-    print("RUNNING TEST_CALENDAR()")
-    test_event1 = {"start": {"date": "2022-01-01"}, "end": {"date": "2022-01-07"}, "summary":"test event 1"}
-    test_event2 = {"start": {"date": "2022-02-01"}, "end": {"date": "2022-02-07"}, "summary":"test event 2"}
-    events = [test_event1, test_event2]
+# def test_calendar():
+#     print("RUNNING TEST_CALENDAR()")
+#     test_event1 = {"start": {"date": "2022-01-01"}, "end": {"date": "2022-01-07"}, "summary":"test event 1"}
+#     test_event2 = {"start": {"date": "2022-02-01"}, "end": {"date": "2022-02-07"}, "summary":"test event 2"}
+#     events = [test_event1, test_event2]
 
-    return events
+#     return events
 
-def demo(request):
-    results = test_calendar()
-    context = {"results": results}
-    return render(request, 'calendar.html', context)
+# def demo(request):
+#     results = test_calendar()
+#     context = {"results": results}
+#     return render(request, 'calendar.html', context)
 
 
-class AuthCompleteView(View):
-    def get(self, request, *args, **kwargs):
-        # Inicializa la estrategia de autenticación
-        strategy = load_strategy(request)
-        backend = google_auth_oauthlib(DjangoStrategy(request, strategy), redirect_uri=None)
+# class AuthCompleteView(View):
+#     def get(self, request, *args, **kwargs):
+#         # Inicializa la estrategia de autenticación
+#         strategy = load_strategy(request)
+#         backend = google_auth_oauthlib(DjangoStrategy(request, strategy), redirect_uri=None)
 
-        # Intenta autenticar al usuario con Google
-        try:
-            user = backend.do_auth(request.GET.urlencode())
-            login(request, user)
-        except AuthException as e:
-            # Manejar errores de autenticación aquí si es necesario
-            # Puedes redirigir a una página de error o mostrar un mensaje
-            return HttpResponseRedirect('/auth/google/error')
+#         # Intenta autenticar al usuario con Google
+#         try:
+#             user = backend.do_auth(request.GET.urlencode())
+#             login(request, user)
+#         except AuthException as e:
+#             # Manejar errores de autenticación aquí si es necesario
+#             # Puedes redirigir a una página de error o mostrar un mensaje
+#             return HttpResponseRedirect('/auth/google/error')
 
-        # Si la autenticación fue exitosa, redirige a la página de inicio o a donde desees
-        return HttpResponseRedirect('/')
+#         # Si la autenticación fue exitosa, redirige a la página de inicio o a donde desees
+#         return HttpResponseRedirect('/')
 
-    def post(self, request, *args, **kwargs):
-        return HttpResponse("Método POST no permitido", status=405)
+#     def post(self, request, *args, **kwargs):
+#         return HttpResponse("Método POST no permitido", status=405)
     
-def list_files(request):
-    credentials = Credentials.from_service_account_file(
-        settings.GOOGLE_DRIVE_CREDENTIALS,
-        scopes=['https://www.googleapis.com/auth/drive.readonly']
-    )
+# def list_files(request):
+#     credentials = Credentials.from_service_account_file(
+#         settings.GOOGLE_DRIVE_CREDENTIALS,
+#         scopes=['https://www.googleapis.com/auth/drive.readonly']
+#     )
 
-    service = build('drive', 'v3', credentials=credentials)
+#     service = build('drive', 'v3', credentials=credentials)
 
-    results = service.files().list().execute()
-    files = results.get('files', [])
+#     results = service.files().list().execute()
+#     files = results.get('files', [])
 
-    # return JsonResponse(files, safe=False)
-    return render(request, 'list_files.html', {'files': files})
+#     # return JsonResponse(files, safe=False)
+#     return render(request, 'list_files.html', {'files': files})
 
-def login_with_google(request):
-    return redirect('social:begin', 'google-oauth2')
+# def login_with_google(request):
+#     return redirect('social:begin', 'google-oauth2')
 
 # def conectar(request):
 #     # Obtén el cliente de Google Drive.
@@ -1004,3 +1006,38 @@ def login_with_google(request):
 #     }
 
 #     return render(request, 'conectar.html', context)
+
+# CONEXIÓN CON API OPEN EXCHANGE RATE (CONVERSIÓN DE DIVISAS)
+# def get_exchange_rates(request):
+#     if request.GET:
+#         api_key = '051f01d6b07d4ea5997f2a21d8c4c14f'  # Clave de API
+#         base_currency = 'USD'
+#         symbols = 'EUR,GBP'
+
+#         url = f"https://openexchangerates.org/api/latest.json?app_id={api_key}&base={base_currency}&symbols={symbols}"
+#         response = requests.get(url)
+
+#         if response.status_code == 200:
+#             data = response.json()
+#             return JsonResponse(data)
+#         else:
+#             return JsonResponse({'error': 'No se pudieron obtener las tasas de cambio.'}, status=500) """
+
+def exchange_rate(request):
+    try:
+        api_key = settings.OPEN_EXCHANGE_RATES_API_KEY
+        base_currency = 'USD'
+        api_url = f'https://openexchangerates.org/api/latest.json?app_id={api_key}&base={base_currency}'
+        # Se añade historical/2013-02-16.json para consultar en determinada fecha
+        response = requests.get(api_url)
+        response.raise_for_status()  # Manejo de errores de solicitud
+
+        if response.status_code == 200:
+            data = response.json()
+        else:
+            # Puedes manejar la respuesta en función del estado aquí
+            data = {}
+    except requests.RequestException as e:
+        data = {}
+
+    return render(request, 'exchange_rate.html', {'data': data})

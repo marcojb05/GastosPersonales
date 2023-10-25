@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
-from api.views import Home, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, dashboard, AuthCompleteView
+from api.views import Home, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, dashboard #, AuthCompleteView
 from api import views
 from django.views.generic.base import RedirectView
 
@@ -43,11 +43,13 @@ urlpatterns = [
     path('metas/', Metas.as_view(), name="metas"),
     path('dashboard/', dashboard.as_view(), name="dashboard"),
     # path('demo/', views.interactuar_con_google_calendar, name='demo'),
-    path('demo/', views.interactuar_con_google_calendar, name='demo'),
-    path('auth/google/', AuthCompleteView.as_view(), name='auth_google'),
-    path('drive', views.list_files, name='drive'),
-    path('auth/', include('social_django.urls', namespace='social')),
+    # path('demo/', views.interactuar_con_google_calendar, name='demo'),
+    # path('auth/google/', AuthCompleteView.as_view(), name='auth_google'),
+    # path('drive', views.list_files, name='drive'),
+    # path('auth/', include('social_django.urls', namespace='social')),
     # path('conecta', views.conectar,  name='conecta'),
     # path('auth/google/callback/', AuthCompleteView.as_view(), name='auth_google_callback'),
     # path('auth/google/error/', AuthErrorView.as_view(), name='auth_google_error'),
+    # path('get-exchange-rates/', views.get_exchange_rates, name='get_exchange_rates'),
+    path('exchange-rate/', views.exchange_rate, name='exchange_rate'),
 ]

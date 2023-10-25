@@ -1,10 +1,12 @@
 from datetime import datetime
-import datetime
+import os
 from sqlite3 import IntegrityError
 from django.core.mail import send_mail
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
+import google_auth_oauthlib
 from rest_framework.views import APIView
-
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User  # Permite el registro
 # Permite crear la cookie con el registro del login
@@ -20,7 +22,21 @@ import secrets
 import string
 # Importación de los modelos
 from django.db.models import Q, Count
+
+from APITESCHI.settings import BASE_DIR
 from .models import Moneda, Categoria, Tarjeta, MetodoPago, Transaccion, TipoTransaccion, Ahorro, MetaFinanciera, Pago, encuesta
+# CONEXIÓN CON API DE GOOGLE CALENDAR
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from django.contrib.auth import login
+from social_django.utils import load_strategy
+from social_django.strategy import DjangoStrategy
+from social_core.backends.google import GoogleOAuth2
+from social_core.exceptions import AuthException
+from google.oauth2.service_account import Credentials
+from django.conf import settings
+from django.http import JsonResponse
+# from django_googledrive_api import GoogleDriveClient
 
 # Create your views here.
 
@@ -833,9 +849,158 @@ class dashboard(APIView):
         calificaciones = encuesta.objects.values('pregunta1').annotate(total=Count('pregunta1')).order_by('pregunta1')
         etiquetasPregunta1 = [calificacion['pregunta1'] for calificacion in calificaciones]
         valoresPregunta1 = [calificacion['total'] for calificacion in calificaciones]
-        calificaciones = encuesta.objects.values('pregunta1').annotate(total=Count('pregunta1')).order_by('pregunta1')
+        
+        # Pregunta 2 -facilidad de uso- de barras
+        facilidades = encuesta.objects.values('pregunta2').annotate(total=Count('pregunta2')).order_by('pregunta2')
+        etiquetasPregunta2 = [facilidad['pregunta2'] for facilidad in facilidades]
+        valoresPregunta2 = [facilidad['total'] for facilidad in facilidades]
+        
+        # Pregunta 3 -interfaz amigable- circular
+        usos = encuesta.objects.values('pregunta3').annotate(total=Count('pregunta3'))
+        etiquetasPregunta3 = [uso['pregunta3'] for uso in usos]
+        valoresPregunta3 = [uso['total'] for uso in usos]
+        
+        # Pregunta 4 -frecuencia de problemas- dona
+        problemas = encuesta.objects.values('pregunta4').annotate(total=Count('pregunta4'))
+        etiquetasPregunta4 = [problema['pregunta4'] for problema in problemas]
+        valoresPregunta4 = [problema['total'] for problema in problemas]
+        
+        # Pregunta 5 -frecuencia de problemas- dona
+        adaptables = encuesta.objects.values('pregunta5').annotate(total=Count('pregunta5'))
+        etiquetasPregunta5 = [adaptable['pregunta5'] for adaptable in adaptables]
+        valoresPregunta5 = [adaptable['total'] for adaptable in adaptables]
+        
+        # Pregunta 6 -mejoras- radar
+        mejoras = encuesta.objects.values('pregunta6').annotate(total=Count('pregunta6')).order_by('pregunta6')
+        etiquetasPregunta6 = [mejora['pregunta6'] for mejora in mejoras]
+        valoresPregunta6 = [mejora['total'] for mejora in mejoras]
+        
+        # Pregunta 7 -informes - barras
+        informes = encuesta.objects.values('pregunta7').annotate(total=Count('pregunta7'))
+        etiquetasPregunta7 = [informe['pregunta7'] for informe in informes]
+        valoresPregunta7 = [informe['total'] for informe in informes ]
+        
+        # Pregunta 8 -divisas- barras
+        divisas = encuesta.objects.values('pregunta8').annotate(total=Count('pregunta8')).order_by('pregunta8')
+        etiquetasPregunta8 = [divisa['pregunta8'] for divisa in divisas]
+        valoresPregunta8 = [divisa['total'] for divisa in divisas]
+        
+        # Pregunta 9 -interrupciones- linea
+        interrupciones = encuesta.objects.values('pregunta9').annotate(total=Count('pregunta9'))
+        etiquetasPregunta9 = [interrupcion['pregunta9'] for interrupcion in interrupciones]
+        valoresPregunta9 = [interrupcion['total'] for interrupcion in interrupciones]
+        
+        # Pregunta 10 -pérdidas- circular
+        perdidas = encuesta.objects.values('pregunta10').annotate(total=Count('pregunta10'))
+        etiquetasPregunta10 = [perdida['pregunta10'] for perdida in perdidas]
+        valoresPregunta10 = [perdida['total'] for perdida in perdidas]
+        
         return render(request, self.template_name,{'etiquetasPregunta1': etiquetasPregunta1,
-                                                   'valoresPregunta1': valoresPregunta1})
+                                                   'valoresPregunta1': valoresPregunta1,
+                                                   'etiquetasPregunta2': etiquetasPregunta2,
+                                                   'valoresPregunta2': valoresPregunta2,
+                                                   'etiquetasPregunta3': etiquetasPregunta3,
+                                                   'valoresPregunta3': valoresPregunta3,
+                                                   'etiquetasPregunta4': etiquetasPregunta4,
+                                                   'valoresPregunta4': valoresPregunta4,
+                                                   'etiquetasPregunta5': etiquetasPregunta5,
+                                                   'valoresPregunta5': valoresPregunta5,
+                                                   'etiquetasPregunta6': etiquetasPregunta6,
+                                                   'valoresPregunta6': valoresPregunta6,
+                                                   'etiquetasPregunta7': etiquetasPregunta7,
+                                                   'valoresPregunta7': valoresPregunta7,
+                                                   'etiquetasPregunta8': etiquetasPregunta8,
+                                                   'valoresPregunta8': valoresPregunta8,
+                                                   'etiquetasPregunta9': etiquetasPregunta9,
+                                                   'valoresPregunta9': valoresPregunta9,
+                                                   'etiquetasPregunta10': etiquetasPregunta10,
+                                                   'valoresPregunta10': valoresPregunta10})
     
     def post(self, request):
         return render(request, self.template_name)
+   
+# GOOGLE CALENDAR
+def interactuar_con_google_calendar(request):
+    # Ruta al archivo JSON de credenciales que descargaste
+    archivo_de_credenciales = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
+
+    # Carga las credenciales desde el archivo JSON
+    credentials = service_account.Credentials.from_service_account_file(
+        archivo_de_credenciales,
+        scopes=['https://www.googleapis.com/auth/calendar']
+    )
+
+    # Construye el servicio de Google Calendar API
+    service = build('calendar', 'v3', credentials=credentials)
+
+    # Ahora puedes utilizar 'service' para interactuar con la API de Google Calendar
+
+    # Por ejemplo, obtener la lista de calendarios
+    calendarios = service.calendarList().list().execute()
+    print(calendarios)
+    return render(request, 'calendar.html', {'calendarios': calendarios})
+
+def test_calendar():
+    print("RUNNING TEST_CALENDAR()")
+    test_event1 = {"start": {"date": "2022-01-01"}, "end": {"date": "2022-01-07"}, "summary":"test event 1"}
+    test_event2 = {"start": {"date": "2022-02-01"}, "end": {"date": "2022-02-07"}, "summary":"test event 2"}
+    events = [test_event1, test_event2]
+
+    return events
+
+def demo(request):
+    results = test_calendar()
+    context = {"results": results}
+    return render(request, 'calendar.html', context)
+
+
+class AuthCompleteView(View):
+    def get(self, request, *args, **kwargs):
+        # Inicializa la estrategia de autenticación
+        strategy = load_strategy(request)
+        backend = google_auth_oauthlib(DjangoStrategy(request, strategy), redirect_uri=None)
+
+        # Intenta autenticar al usuario con Google
+        try:
+            user = backend.do_auth(request.GET.urlencode())
+            login(request, user)
+        except AuthException as e:
+            # Manejar errores de autenticación aquí si es necesario
+            # Puedes redirigir a una página de error o mostrar un mensaje
+            return HttpResponseRedirect('/auth/google/error')
+
+        # Si la autenticación fue exitosa, redirige a la página de inicio o a donde desees
+        return HttpResponseRedirect('/')
+
+    def post(self, request, *args, **kwargs):
+        return HttpResponse("Método POST no permitido", status=405)
+    
+def list_files(request):
+    credentials = Credentials.from_service_account_file(
+        settings.GOOGLE_DRIVE_CREDENTIALS,
+        scopes=['https://www.googleapis.com/auth/drive.readonly']
+    )
+
+    service = build('drive', 'v3', credentials=credentials)
+
+    results = service.files().list().execute()
+    files = results.get('files', [])
+
+    # return JsonResponse(files, safe=False)
+    return render(request, 'list_files.html', {'files': files})
+
+def login_with_google(request):
+    return redirect('social:begin', 'google-oauth2')
+
+# def conectar(request):
+#     # Obtén el cliente de Google Drive.
+#     client = GoogleDriveClient()
+
+#     # Listado de todos los archivos en la raíz del almacenamiento de Google Drive.
+#     files = client.list_files()
+
+#     context = {
+#         'files': files,
+#     }
+
+#     return render(request, 'conectar.html', context)

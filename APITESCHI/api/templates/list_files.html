@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de archivos de Google Drive</title>
+</head>
+<body>
+    <h1>Lista de archivos de Google Drive</h1>
+    <a href="{% url 'social:begin' 'google-oauth2' %}">Iniciar sesión con Google</a>
+    <ul>
+        {% for file in files %}
+            <li>
+                <strong>{{ file.name }}</strong> (ID: {{ file.id }}) <br>
+                Tipo de archivo: {{ file.mimeType }} <br>
+                Última modificación: {{ file.modifiedTime }}
+            </li>
+        {% empty %}
+            <li>No se encontraron archivos en Google Drive.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

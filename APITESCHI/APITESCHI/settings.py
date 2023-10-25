@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from google.oauth2 import service_account
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -115,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-mx'
 
 TIME_ZONE = 'UTC'
 
@@ -146,9 +149,42 @@ EMAIL_HOST_PASSWORD = 'tcsj qova zdml elzr'
 # CIERRE DE SESIÓN POR INACTIVIDAD
 # Configura el motor de almacenamiento de sesión
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-
 # Configura el tiempo de expiración de la sesión en segundos (Ahorita 15 minutos)
-SESSION_COOKIE_AGE = 600
-
+SESSION_COOKIE_AGE = 1500
 # Cada que el usuario hace una solicitud al servidor el tiempo de la sesion se reinicia
 SESSION_SAVE_EVERY_REQUEST = True
+
+# CONEXIÓN CON GOOGLE CALENDAR
+# GOOGLE_CALENDAR_CREDENTIALS = os.path.join(settings.BASE_DIR, './APITESCHI/credentials.json')
+# GOOGLE_CALENDAR_SCOPES = ['https://www.googleapis.com/auth/calendar']
+# GOOGLE_CALENDAR_SERVICE = service_account.Credentials.from_service_account_file(
+#     GOOGLE_CALENDAR_CREDENTIALS, scopes=GOOGLE_CALENDAR_SCOPES
+# )
+AUTHENTICATION_BACKENDS = (
+    'social.backends.google.GoogleOAuth2',
+    # Otros backends si los tienes
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1066329997641-sos8ehrmq7jhjue45kc5bgic0thufu16.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '84e70ab4eb8af15fb739ba3f5b20c4d25226ee26'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CREDENTIALS_FILE = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
+
+# Cargar las credenciales desde el archivo JSON
+credentials = service_account.Credentials.from_service_account_file(
+    CREDENTIALS_FILE,
+    scopes=['https://www.googleapis.com/auth/calendar.events']
+)
+GOOGLEDRIVE_CREDENTIALS_FILE = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
+
+# GOOGLE_DRIVE_CREDENTIALS = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
+
+# AUTHENTICATION_BACKENDS = (
+#     'social_core.backends.google.GoogleOAuth2',
+#     'django.contrib.auth.backends.ModelBackend',
+# )
+
+# LOGIN_URL = 'login'
+# LOGOUT_URL = 'logout'
+# LOGIN_REDIRECT_URL = 'home'

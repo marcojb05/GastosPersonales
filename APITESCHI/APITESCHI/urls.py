@@ -15,16 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
-from api.views import Home, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, tabla_html, dashboard
+from django.urls import include, path, re_path
+from api.views import Home, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, dashboard, AuthCompleteView
 from api import views
 from django.views.generic.base import RedirectView
 
-
-favicon_view = RedirectView.as_view(url='/static/img/favicon.ico', permanent=True)
-
 urlpatterns = [
-    re_path(r'^favicon\.ico$', favicon_view),
     path('admin/', admin.site.urls),
     path('', Home.as_view(), name='index'),
     path('signup/', views.Registrar, name="registro"),
@@ -46,4 +42,12 @@ urlpatterns = [
     path('tarjetas/', Tarjetas.as_view(), name="tarjetas"),
     path('metas/', Metas.as_view(), name="metas"),
     path('dashboard/', dashboard.as_view(), name="dashboard"),
+    # path('demo/', views.interactuar_con_google_calendar, name='demo'),
+    path('demo/', views.interactuar_con_google_calendar, name='demo'),
+    path('auth/google/', AuthCompleteView.as_view(), name='auth_google'),
+    path('drive', views.list_files, name='drive'),
+    path('auth/', include('social_django.urls', namespace='social')),
+    # path('conecta', views.conectar,  name='conecta'),
+    # path('auth/google/callback/', AuthCompleteView.as_view(), name='auth_google_callback'),
+    # path('auth/google/error/', AuthErrorView.as_view(), name='auth_google_error'),
 ]

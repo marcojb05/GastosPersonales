@@ -1041,3 +1041,58 @@ def exchange_rate(request):
         data = {}
 
     return render(request, 'exchange_rate.html', {'data': data})
+
+class conversor(APIView):
+    template_name = "conversor.html"
+
+    # MÉTODO GET
+    def get(self, request):
+        context = self.get_context_data('none', '')
+        return render(request, self.template_name, context)
+
+    # MÉTODO POST
+    def post(self, request):
+        #Comprueba que estén los datos requeridos.
+        if self.verifica() == False:
+            context = self.get_context_data('block', 'Todos los campos son obligatorios.')
+            return render(request, self.template_name, context)
+        else:
+            # OBTTENER LOS DATOS POR POST
+            monedaDe = request.POST['monedaDe']
+            monedaA = request.POST['monedaA']
+            convertir = request.POST['convertir']
+            
+            # GENERACIÓN DE ID DE TRANSACCIÓN (INGRESO)
+            
+            try:
+                
+                context = self.get_context_data('none', '')
+                return render(request, self.template_name, context)
+            except IntegrityError:
+                context = self.get_context_data('block', 'Error, se presentó una duplicación de datos')
+                return render(request, self.template_name, context)
+            except Exception as e:
+                context = self.get_context_data('block', f"Los datos ingresados no son válidos: {str(e)}")
+                return render(request, self.template_name, context)
+    
+    # Realiza las consultas y renderiza en los campos
+    def get_context_data(self, mensajeError, error):
+        
+        # Consulta las monedas registradas en la BD
+        monedas = Moneda.objects.all()
+        
+        return {
+            'monedas': monedas,
+            'mostrarError': mensajeError,
+            'error': error,
+        }
+
+    # Verifica que existan los campos del HTML
+    def verifica(self):
+        if ('monedaDe' not in self.request.POST or
+            'monedaA' not in self.request.POST or
+            'convertir' not in self.request.POST
+            ):
+            return False
+        else:
+            return True

@@ -78,7 +78,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'APITESCHI.wsgi.application'
+WSGI_APPLICATION = 'APITESCHI.APITESCHI.wsgi.application'
 
 
 # Database

@@ -37,7 +37,6 @@ from django.contrib.auth import login
 # from google.oauth2.service_account import Credentials
 from django.conf import settings
 from django.http import JsonResponse
-from openexchangerate import OpenExchangeRates
 # from django_googledrive_api import GoogleDriveClient
 
 # Create your views here.

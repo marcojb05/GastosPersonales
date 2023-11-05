@@ -1095,3 +1095,12 @@ class conversor(APIView):
             return False
         else:
             return True
+        
+def custom_404_view(request, exception):
+    return render(request, '404.html', status=404)
+
+class error404(APIView):
+    def get(self, request):
+        return render(request, '404.html', status=404)
+    def post(self, request):
+        return render(request, '404.html', status=404)

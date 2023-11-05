@@ -4,7 +4,6 @@ from sqlite3 import IntegrityError
 from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
 import requests
 # import google_auñth_oauthlib
 from rest_framework.views import APIView
@@ -30,14 +29,9 @@ from .models import Moneda, Categoria, Tarjeta, MetodoPago, Transaccion, TipoTra
 # from google.oauth2 import service_account
 # from googleapiclient.discovery import build
 from django.contrib.auth import login
-# from social_django.utils import load_strategy
-# from social_django.strategy import DjangoStrategy
-# from social_core.backends.google import GoogleOAuth2
-# from social_core.exceptions import AuthException
-# from google.oauth2.service_account import Credentials
 from django.conf import settings
 from django.http import JsonResponse
-# from django_googledrive_api import GoogleDriveClient
+from .calendar_setup import get_calendar_service
 
 # Create your views here.
 
@@ -594,39 +588,43 @@ class DeudasPagos (APIView):
             #monedaF = request.POST['moneda']
             notaF = request.POST['nota']
             
-            # GENERACIÓN DE ID DE TRANSACCIÓN (INGRESO)
-            current_time = datetime.now()
-            usuario = request.user
-            usuario_id = usuario.id
-            fecha = f"A{usuario_id}-{current_time.strftime('%Y%m%d%H%M%S')}"
-            transaction_id = str(fecha)
-            metodoPagoF = request.POST['metodoPago']
-            user = get_object_or_404(User, id=usuario_id)  # usuario_id es el valor que deseas asignar como clave foránea
-            print("Estado del usuario ", user)
-            if metodoPagoF == 'MP-EFEC':
-                metodo = request.POST['efectivoSel']
-            elif metodoPagoF == 'MP-TARJ':
-                metodo = request.POST['tarjetaSel']
+            if self.create_event('') is not False:
+                context = self.get_context_data('block', 'No se ha podido comunicar con Google Calendar', 'none', '')
+                return render(request, self.template_name, context)
             else:
-                context = self.get_context_data('block', 'El método de pago no es válido', 'none', '')
-                return render(request, self.template_name, context)
-            try:
-                nuevoPago = Pago(id_ahorro=transaction_id,
-                                     descripcion=notaF,
-                                     monto=montoF,
-                                     fecha=fechaF,
-                                     fk_cuenta=Tarjeta.objects.get(id_cuenta=metodo),
-                                     fk_usuario=User.objects.get(id = usuario_id),
-                                    )
-                nuevoPago.save()
-                context = self.get_context_data('none', '', 'block', 'Los datos se han registrado correctamente.')
-                return render(request, self.template_name, context)
-            except IntegrityError:
-                context = self.get_context_data('block', 'Error, se presentó una duplicación de datos', 'none', '')
-                return render(request, self.template_name, context)
-            except Exception as e:
-                context = self.get_context_data('block', f"Los datos ingresados no son válidos: {str(e)}", 'none', '')
-                return render(request, self.template_name, context)
+                # GENERACIÓN DE ID DE TRANSACCIÓN (INGRESO)
+                current_time = datetime.now()
+                usuario = request.user
+                usuario_id = usuario.id
+                fecha = f"A{usuario_id}-{current_time.strftime('%Y%m%d%H%M%S')}"
+                transaction_id = str(fecha)
+                metodoPagoF = request.POST['metodoPago']
+                user = get_object_or_404(User, id=usuario_id)  # usuario_id es el valor que deseas asignar como clave foránea
+                print("Estado del usuario ", user)
+                if metodoPagoF == 'MP-EFEC':
+                    metodo = request.POST['efectivoSel']
+                elif metodoPagoF == 'MP-TARJ':
+                    metodo = request.POST['tarjetaSel']
+                else:
+                    context = self.get_context_data('block', 'El método de pago no es válido', 'none', '')
+                    return render(request, self.template_name, context)
+                try:
+                    nuevoPago = Pago(id_ahorro=transaction_id,
+                                        descripcion=notaF,
+                                        monto=montoF,
+                                        fecha=fechaF,
+                                        fk_cuenta=Tarjeta.objects.get(id_cuenta=metodo),
+                                        fk_usuario=User.objects.get(id = usuario_id),
+                                        )
+                    nuevoPago.save()
+                    context = self.get_context_data('none', '', 'block', 'Los datos se han registrado correctamente.')
+                    return render(request, self.template_name, context)
+                except IntegrityError:
+                    context = self.get_context_data('block', 'Error, se presentó una duplicación de datos', 'none', '')
+                    return render(request, self.template_name, context)
+                except Exception as e:
+                    context = self.get_context_data('block', f"Los datos ingresados no son válidos: {str(e)}", 'none', '')
+                    return render(request, self.template_name, context)
     
     # Realiza las consultas y renderiza en los campos
     def get_context_data(self, mensajeError, error, mostrarMensaje, mensaje):        
@@ -676,6 +674,30 @@ class DeudasPagos (APIView):
             return False
         else:
             return True
+        
+    # Crea el evento en Google Calendar
+    def create_event(self, fechaInicio, fechaTermino, tituloEvento, descripcion):
+        fechaInicio = datetime(2023, 11, 4, 10, 0)
+        fechaTermino = datetime(2023, 11, 4, 11, 0)
+        tituloEvento = 'Evento de ejemplo'
+        descripcion = 'Realizando pruebas de creación de eventos en Google Calendar'
+        fechaInicioISO = fechaInicio.isoformat()
+        fechaTerminoISO = fechaTermino.isoformat()
+        calendar_service = get_calendar_service() 
+        try:
+            event_result = calendar_service.events().insert(calendarId='primary',
+                body={
+                    "summary": tituloEvento,
+                    "description": descripcion,
+                    "start": {"dateTime": fechaInicioISO, "timeZone": 'America/Mexico_City'},
+                    "end": {"dateTime": fechaTerminoISO, "timeZone": 'America/Mexico_City'},
+                }
+            ).execute()
+            return event_result['id']
+        except Exception as e:
+            return False
+    
+
 
 @method_decorator(login_required, name='dispatch')
 class Tarjetas(APIView):
@@ -919,108 +941,22 @@ class dashboard(APIView):
     
     def post(self, request):
         return render(request, self.template_name)
-   
-""" # GOOGLE CALENDAR
-# def interactuar_con_google_calendar(request):
-#     # Ruta al archivo JSON de credenciales que descargaste
-#     archivo_de_credenciales = os.path.join(BASE_DIR, 'finanzapp-402806-84e70ab4eb8a.json')
-
-#     # Carga las credenciales desde el archivo JSON
-#     credentials = service_account.Credentials.from_service_account_file(
-#         archivo_de_credenciales,
-#         scopes=['https://www.googleapis.com/auth/calendar']
-#     )
-
-#     # Construye el servicio de Google Calendar API
-#     service = build('calendar', 'v3', credentials=credentials)
-
-#     # Ahora puedes utilizar 'service' para interactuar con la API de Google Calendar
-
-#     # Por ejemplo, obtener la lista de calendarios
-#     calendarios = service.calendarList().list().execute()
-#     print(calendarios)
-#     return render(request, 'calendar.html', {'calendarios': calendarios})
-
-# def test_calendar():
-#     print("RUNNING TEST_CALENDAR()")
-#     test_event1 = {"start": {"date": "2022-01-01"}, "end": {"date": "2022-01-07"}, "summary":"test event 1"}
-#     test_event2 = {"start": {"date": "2022-02-01"}, "end": {"date": "2022-02-07"}, "summary":"test event 2"}
-#     events = [test_event1, test_event2]
-
-#     return events
-
-# def demo(request):
-#     results = test_calendar()
-#     context = {"results": results}
-#     return render(request, 'calendar.html', context)
-
-
-# class AuthCompleteView(View):
-#     def get(self, request, *args, **kwargs):
-#         # Inicializa la estrategia de autenticación
-#         strategy = load_strategy(request)
-#         backend = google_auth_oauthlib(DjangoStrategy(request, strategy), redirect_uri=None)
-
-#         # Intenta autenticar al usuario con Google
-#         try:
-#             user = backend.do_auth(request.GET.urlencode())
-#             login(request, user)
-#         except AuthException as e:
-#             # Manejar errores de autenticación aquí si es necesario
-#             # Puedes redirigir a una página de error o mostrar un mensaje
-#             return HttpResponseRedirect('/auth/google/error')
-
-#         # Si la autenticación fue exitosa, redirige a la página de inicio o a donde desees
-#         return HttpResponseRedirect('/')
-
-#     def post(self, request, *args, **kwargs):
-#         return HttpResponse("Método POST no permitido", status=405)
-    
-# def list_files(request):
-#     credentials = Credentials.from_service_account_file(
-#         settings.GOOGLE_DRIVE_CREDENTIALS,
-#         scopes=['https://www.googleapis.com/auth/drive.readonly']
-#     )
-
-#     service = build('drive', 'v3', credentials=credentials)
-
-#     results = service.files().list().execute()
-#     files = results.get('files', [])
-
-#     # return JsonResponse(files, safe=False)
-#     return render(request, 'list_files.html', {'files': files})
-
-# def login_with_google(request):
-#     return redirect('social:begin', 'google-oauth2')
-
-# def conectar(request):
-#     # Obtén el cliente de Google Drive.
-#     client = GoogleDriveClient()
-
-#     # Listado de todos los archivos en la raíz del almacenamiento de Google Drive.
-#     files = client.list_files()
-
-#     context = {
-#         'files': files,
-#     }
-
-#     return render(request, 'conectar.html', context)
 
 # CONEXIÓN CON API OPEN EXCHANGE RATE (CONVERSIÓN DE DIVISAS)
-# def get_exchange_rates(request):
-#     if request.GET:
-#         api_key = '051f01d6b07d4ea5997f2a21d8c4c14f'  # Clave de API
-#         base_currency = 'USD'
-#         symbols = 'EUR,GBP'
+def get_exchange_rates(request):
+    if request.GET:
+        api_key = '051f01d6b07d4ea5997f2a21d8c4c14f'  # Clave de API
+        base_currency = 'USD'
+        symbols = 'EUR,GBP'
 
-#         url = f"https://openexchangerates.org/api/latest.json?app_id={api_key}&base={base_currency}&symbols={symbols}"
-#         response = requests.get(url)
+        url = f"https://openexchangerates.org/api/latest.json?app_id={api_key}&base={base_currency}&symbols={symbols}"
+        response = requests.get(url)
 
-#         if response.status_code == 200:
-#             data = response.json()
-#             return JsonResponse(data)
-#         else:
-#             return JsonResponse({'error': 'No se pudieron obtener las tasas de cambio.'}, status=500) """
+        if response.status_code == 200:
+            data = response.json()
+            return JsonResponse(data)
+        else:
+            return JsonResponse({'error': 'No se pudieron obtener las tasas de cambio.'}, status=500)
 
 def exchange_rate(request):
     try:

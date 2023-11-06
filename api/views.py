@@ -1,4 +1,5 @@
 import datetime
+from datetime import datetime
 import os
 from sqlite3 import IntegrityError
 from django.core.mail import send_mail
@@ -577,27 +578,25 @@ class DeudasPagos (APIView):
 
     # MÉTODO POST
     def post(self, request):
-        #Comprueba que estén los datos requeridos.
-        if self.verifica() == False:
-            context = self.get_context_data('block', 'Todos los campos son obligatorios.', 'none', '')
-            return render(request, self.template_name, context)
-        else:
-            # OBTTENER LOS DATOS POR POST
+        # OBTTENER LOS DATOS POR POST
+        if self.verifica() == True:
+            tituloF = request.POST['titulo']
+            descripcionF = request.POST['descripcion']
             montoF = request.POST['monto']
-            fechaF = request.POST['fecha']
-            #monedaF = request.POST['moneda']
-            notaF = request.POST['nota']
-            
-            if self.create_event('') is not False:
-                context = self.get_context_data('block', 'No se ha podido comunicar con Google Calendar', 'none', '')
+            fechaInicioF = request.POST['fechaInicio']
+            fechaTerminoF = request.POST['fechaTermino']
+            frecuenciaF = request.POST['frecuencia']
+            monedaF = request.POST['moneda']
+            # fechaInicio, fechaTermino, tituloEvento, descripcion, frecuencia
+            insercionCalendario = self.create_event(fechaInicioF, fechaTerminoF, tituloF, descripcionF)
+            if insercionCalendario is False:
+                context = self.get_context_data('block', 'Ha ocurrido un error al conectar con Google Calendar.', 'none', '')
                 return render(request, self.template_name, context)
             else:
                 # GENERACIÓN DE ID DE TRANSACCIÓN (INGRESO)
-                current_time = datetime.now()
                 usuario = request.user
                 usuario_id = usuario.id
-                fecha = f"A{usuario_id}-{current_time.strftime('%Y%m%d%H%M%S')}"
-                transaction_id = str(fecha)
+                transaction_id = insercionCalendario
                 metodoPagoF = request.POST['metodoPago']
                 user = get_object_or_404(User, id=usuario_id)  # usuario_id es el valor que deseas asignar como clave foránea
                 print("Estado del usuario ", user)
@@ -609,22 +608,28 @@ class DeudasPagos (APIView):
                     context = self.get_context_data('block', 'El método de pago no es válido', 'none', '')
                     return render(request, self.template_name, context)
                 try:
-                    nuevoPago = Pago(id_ahorro=transaction_id,
-                                        descripcion=notaF,
-                                        monto=montoF,
-                                        fecha=fechaF,
-                                        fk_cuenta=Tarjeta.objects.get(id_cuenta=metodo),
-                                        fk_usuario=User.objects.get(id = usuario_id),
-                                        )
+                    nuevoPago = Pago(id_pago=transaction_id,
+                                     titulo=tituloF,
+                                     descripcion=descripcionF,
+                                     monto=montoF,
+                                     fechaInicio=fechaInicioF,
+                                     fechaTermino=fechaTerminoF,
+                                     frecuencia=frecuenciaF,
+                                     fk_cuenta=Tarjeta.objects.get(id_cuenta=metodo),
+                                     fk_usuario=User.objects.get(id = usuario_id),
+                                    )
                     nuevoPago.save()
                     context = self.get_context_data('none', '', 'block', 'Los datos se han registrado correctamente.')
                     return render(request, self.template_name, context)
                 except IntegrityError:
-                    context = self.get_context_data('block', 'Error, se presentó una duplicación de datos', 'none', '')
+                    context = self.get_context_data('block', 'Error, duplicación de datos', 'none', '')
                     return render(request, self.template_name, context)
                 except Exception as e:
                     context = self.get_context_data('block', f"Los datos ingresados no son válidos: {str(e)}", 'none', '')
                     return render(request, self.template_name, context)
+        else:
+            context = self.get_context_data('block', "Todos los campos son obligatorios", 'none', '')
+            return render(self.request, self.template_name, context)
     
     # Realiza las consultas y renderiza en los campos
     def get_context_data(self, mensajeError, error, mostrarMensaje, mensaje):        
@@ -662,29 +667,43 @@ class DeudasPagos (APIView):
 
     # Verifica que existan los campos del HTML
     def verifica(self):
-        if ('fecha' not in self.request.POST or
+        print(self.request.POST['titulo'])
+        print(self.request.POST['descripcion'])
+        print(self.request.POST['fechaInicio'])
+        print(self.request.POST['fechaTermino'])
+        print(self.request.POST['frecuencia'])
+        print(self.request.POST['monto'])
+        print(self.request.POST['moneda'])
+        print(self.request.POST['categoria'])
+        print(self.request.POST['metodoPago'])
+        print(self.request.POST['tarjetaSel'])
+        if ('titulo' not in self.request.POST or
+            'descripcion' not in self.request.POST or
+            'fechaInicio' not in self.request.POST or
+            'fechaTermino' not in self.request.POST or
+            'frecuencia' not in self.request.POST or
             'monto' not in self.request.POST or
             'moneda' not in self.request.POST or
-            'nota' not in self.request.POST or
+            'categoria' not in self.request.POST or
             'metodoPago' not in self.request.POST or
-            'nota' not in self.request.POST or
-            'efectivoSel' not in self.request.POST or
-            'tarjetaSel' not in self.request.POST
-            ):
+            ('efectivoSel' not in self.request.POST or
+            'tarjetaSel' not in self.request.POST)
+           ):
             return False
         else:
             return True
         
     # Crea el evento en Google Calendar
-    def create_event(self, fechaInicio, fechaTermino, tituloEvento, descripcion):
-        fechaInicio = datetime(2023, 11, 4, 10, 0)
-        fechaTermino = datetime(2023, 11, 4, 11, 0)
-        tituloEvento = 'Evento de ejemplo'
-        descripcion = 'Realizando pruebas de creación de eventos en Google Calendar'
+    def create_event(self, fechaInicios, fechaTerminos, tituloEvento, descripcion):
+        # (aaaa, mm, dd, h, m)
+        fechaInicio = datetime.fromisoformat(fechaInicios)
+        fechaTermino = datetime.fromisoformat(fechaTerminos)
+        self.tituloEvento = tituloEvento
         fechaInicioISO = fechaInicio.isoformat()
         fechaTerminoISO = fechaTermino.isoformat()
         calendar_service = get_calendar_service() 
         try:
+            print("INTENTANDO CONECTAR CON GOOGLE CALENDAR")
             event_result = calendar_service.events().insert(calendarId='primary',
                 body={
                     "summary": tituloEvento,
@@ -693,8 +712,14 @@ class DeudasPagos (APIView):
                     "end": {"dateTime": fechaTerminoISO, "timeZone": 'America/Mexico_City'},
                 }
             ).execute()
+            print("Evento creado con éxito!")
+            print("ID: ", event_result['id'])
+            print("Título: ", event_result['summary'])
+            print("Descripción: ", event_result["description"])
+            print("Empieza en: ", event_result["start"])
+            print("Termina en: ", event_result["end"])
             return event_result['id']
-        except Exception as e:
+        except Exception:
             return False
     
 

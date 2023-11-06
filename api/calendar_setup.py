@@ -5,7 +5,15 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
-CREDENTIALS_FILE = 'credentials.json'
+# Obtiene el directorio actual donde se encuentra el script 'calendar_setup.py'
+directorio_actual = os.path.dirname(__file__)
+
+# Nombre del archivo que deseas leer
+nombre_archivo = 'credentials.json'
+
+# Crea la ruta completa al archivo utilizando la ruta relativa
+CREDENTIALS_FILE = os.path.join(directorio_actual, nombre_archivo)
+# CREDENTIALS_FILE = os.path.relpath('.','credentials.json')
 
 
 def get_calendar_service():

@@ -46,13 +46,14 @@ class Ahorro(models.Model):
 
 # Modelo de pagos
 class Pago(models.Model):
-    id_pago = models.CharField(primary_key=True, max_length=20, db_column='id_pago')
+    id_pago = models.CharField(primary_key=True, max_length=30, db_column='id_pago')
     fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=None, db_column='fk_usuario')
-    nombre_deuda = models.CharField(max_length=255)
-    descripcion = models.TextField()
+    titulo = models.CharField(max_length=50)
+    descripcion = models.TextField(max_length=255)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
-    fechaInicio = models.DateField()
-    fechaTermino = models.DateField()
+    fk_cuenta = models.ForeignKey(Tarjeta, on_delete=models.CASCADE, default=None, db_column='fk_cuenta')
+    fechaInicio = models.DateTimeField()
+    fechaTermino = models.DateTimeField()
     frecuencia = models.CharField(max_length=255)
     class Meta:
         db_table='Pago'
@@ -91,15 +92,15 @@ class Transaccion(models.Model):
         db_table='Transaccion'
         
 class encuesta(models.Model):
-	pregunta1 = models.TextField(db_column='Satisfacción con el sistema')
-	pregunta2 = models.TextField(db_column='Dacilidad de uso y la amigabilidad de la interfaz')
-	pregunta3 = models.TextField(db_column='Facilidad de usar y entender')
-	pregunta4 = models.TextField(db_column='Frecuencia de problemas técnicos o errores')
-	pregunta5 = models.TextField(db_column='Adaptabilidad a necesidades específicas y requisitos comerciales')
-	pregunta6 = models.TextField(db_column='Mejoras en la eficiencia')
-	pregunta7 = models.TextField(db_column='Utilidad de informes y análisis financieros')
-	pregunta8 = models.TextField(db_column='Capacidad para manejar múltiples divisas y tasas de cambio')
-	pregunta9 = models.TextField(db_column='Interrupciones en el servicio')
-	pregunta10 = models.TextField(db_column='Perdida de datos críticos o información financiera')
-	class Meta:
-		db_table: 'encuesta'
+    pregunta1 = models.TextField(db_column='Satisfacción con el sistema')
+    pregunta2 = models.TextField(db_column='Facilidad de uso y la amigabilidad de la interfaz')
+    pregunta3 = models.TextField(db_column='Facilidad de usar y entender')
+    pregunta4 = models.TextField(db_column='Frecuencia de problemas técnicos o errores')
+    pregunta5 = models.TextField(db_column='Adaptabilidad a necesidades específicas y requisitos comerciales')
+    pregunta6 = models.TextField(db_column='Mejoras en la eficiencia')
+    pregunta7 = models.TextField(db_column='Utilidad de informes y análisis financieros')
+    pregunta8 = models.TextField(db_column='Capacidad para manejar múltiples divisas y tasas de cambio')
+    pregunta9 = models.TextField(db_column='Interrupciones en el servicio')
+    pregunta10 = models.TextField(db_column='Perdida de datos críticos o información financiera')
+    class Meta:
+        db_table='encuesta'

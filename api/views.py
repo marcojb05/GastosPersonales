@@ -1,6 +1,4 @@
-import datetime
-from datetime import datetime
-import os
+from datetime import datetime, date, timedelta
 from sqlite3 import IntegrityError
 from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
@@ -151,13 +149,13 @@ class Movimientos (APIView):
     template_name = "movimientos.html"
 
     def get(self, request):
-        fecha_actual = datetime.date.today()
+        fecha_actual = date.today()
         primerDia = fecha_actual.replace(day=1)
         
         # Calcula el primer día del próximo mes restando un día al primer día del mes actual
-        primer_dia_del_proximo_mes = fecha_actual.replace(day=1) + datetime.timedelta(days=31)
+        primer_dia_del_proximo_mes = fecha_actual.replace(day=1) + timedelta(days=31)
         # Resta un día al primer día del próximo mes para obtener el último día del mes actual
-        ultimoDia = primer_dia_del_proximo_mes - datetime.timedelta(days=1)
+        ultimoDia = primer_dia_del_proximo_mes - timedelta(days=1)
         
         fechaInicio = primerDia
         fechaFin = ultimoDia
@@ -654,11 +652,17 @@ class DeudasPagos (APIView):
             fk_usuario=usuario_id
         )
         
+        # Consulta las eventos para las tablas
+        pagos = Pago.objects.filter(
+            fk_usuario=usuario_id
+        )
+        
         return {
             'monedas': monedas,
             'categorias': categorias,
             'carteras': carteras,
             'tarjetas': tarjetas,
+            'pagos': pagos,
             'mostrarError': mensajeError,
             'error': error,
             'mostrarMensaje': mostrarMensaje,

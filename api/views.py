@@ -1069,3 +1069,9 @@ class error404(APIView):
         return render(request, '404.html', status=404)
     def post(self, request):
         return render(request, '404.html', status=404)
+
+class dashboard_powerbi(APIView):
+    def get(self, request):
+        return render(request, 'Dashboard-PowerBI.html')
+    def post(self, request):
+        return render(request, 'Dashboard-PowerBI.html')

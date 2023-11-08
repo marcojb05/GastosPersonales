@@ -4,7 +4,6 @@ from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 import requests
-# import google_auñth_oauthlib
 from rest_framework.views import APIView
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User  # Permite el registro
@@ -21,16 +20,15 @@ import secrets
 import string
 # Importación de los modelos
 from django.db.models import Q, Count
-
 from APITESCHI.settings import BASE_DIR
 from .models import Moneda, Categoria, Tarjeta, MetodoPago, Transaccion, TipoTransaccion, Ahorro, MetaFinanciera, Pago, encuesta
-# CONEXIÓN CON API DE GOOGLE CALENDAR
-# from google.oauth2 import service_account
-# from googleapiclient.discovery import build
 from django.contrib.auth import login
 from django.conf import settings
 from django.http import JsonResponse
+# Calendario
 from .calendar_setup import get_calendar_service
+from googleapiclient.discovery import build
+from google.oauth2.service_account import Credentials
 
 # Create your views here.
 
@@ -568,7 +566,6 @@ class Ahorros (APIView):
 @method_decorator(login_required, name='dispatch')
 class DeudasPagos (APIView):
     template_name = "deudasypagos.html"
-
     # MÉTODO GET
     def get(self, request):
         context = self.get_context_data('none', '', 'none', '')
@@ -597,7 +594,6 @@ class DeudasPagos (APIView):
                 transaction_id = insercionCalendario
                 metodoPagoF = request.POST['metodoPago']
                 user = get_object_or_404(User, id=usuario_id)  # usuario_id es el valor que deseas asignar como clave foránea
-                print("Estado del usuario ", user)
                 if metodoPagoF == 'MP-EFEC':
                     metodo = request.POST['efectivoSel']
                 elif metodoPagoF == 'MP-TARJ':
@@ -671,16 +667,6 @@ class DeudasPagos (APIView):
 
     # Verifica que existan los campos del HTML
     def verifica(self):
-        print(self.request.POST['titulo'])
-        print(self.request.POST['descripcion'])
-        print(self.request.POST['fechaInicio'])
-        print(self.request.POST['fechaTermino'])
-        print(self.request.POST['frecuencia'])
-        print(self.request.POST['monto'])
-        print(self.request.POST['moneda'])
-        print(self.request.POST['categoria'])
-        print(self.request.POST['metodoPago'])
-        print(self.request.POST['tarjetaSel'])
         if ('titulo' not in self.request.POST or
             'descripcion' not in self.request.POST or
             'fechaInicio' not in self.request.POST or
@@ -1061,6 +1047,33 @@ class conversor(APIView):
         else:
             return True
         
+def eliminarEvento(request):
+    if request.method == "POST":
+        # Configura las credenciales y la API
+        calendar_service = get_calendar_service()
+
+        # ID del evento que deseas eliminar
+        event_id = 'rhsipivkfav0f40d8vbsok9jg4'
+
+        # ID del calendario en el que se encuentra el evento
+        calendar_id = 'primary'  # 'primary' representa el calendario principal del usuario
+
+        try:
+            calendar_service.events().delete(calendarId=calendar_id, eventId=event_id).execute()
+            print(f'Evento con ID {event_id} eliminado con éxito.')
+        except Exception as e:
+            print(f'Ocurrió un error al eliminar el evento: {str(e)}')
+        
+def eliminar_registro(request, registro_id):
+    try:
+        mi_registro = Pago.objects.get(id_pago=registro_id)
+        mi_registro.delete()
+        return HttpResponse("Registro eliminado con éxito")
+    except Pago.DoesNotExist:
+        return HttpResponse("El registro no existe")
+    except IntegrityError:
+        return HttpResponse("El registro no puede ser eiminado porque se encuentra referenciado en otra parte.")
+    
 def custom_404_view(request, exception):
     return render(request, '404.html', status=404)
 

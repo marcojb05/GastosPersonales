@@ -645,6 +645,7 @@
                                     <a class="dropdown-item" href="javascript:void(0);"
                                       ><i class="bx bx-trash me-1"></i>Eliminar</a
                                     >
+                                    <button class="eliminar-btn" data-id="{{ pago.id_pago }}">Eliminar</button>
                                   </div>
                                 </div>
                               </td>
@@ -702,5 +703,29 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <!-- OBTENCIÓN DE DATOS PARA ELIMINACIÓN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $(".eliminar-btn").click(function () {
+          var id = $(this).data("id_pago");
+          $.ajax({
+            type: "POST",
+            url: "/eliminar/"+var+"/",
+            data: { id: id, csrfmiddlewaretoken: '{{ csrf_token }}' },  // Asegúrate de incluir el token CSRF
+            success: function (data) {
+              // Procesa la respuesta de Django si es necesario
+              console.log(data);
+            },
+            error: function () {
+              // Maneja errores si es necesario
+              console.error("Error en la solicitud POST");
+            },
+          });
+        });
+      });
+      </script>
+    <!-- OBTENCIÓN DE DATOS PARA ELIMINACIÓN -->
   </body>
 </html>

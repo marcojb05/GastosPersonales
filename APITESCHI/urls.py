@@ -49,5 +49,7 @@ urlpatterns = [
     path('exchange-rate/', views.exchange_rate, name='exchange_rate'),
     path('conversor/', conversor.as_view(), name='conversor'),
     path('error404/', error404.as_view(), name='error404'),
-    path('dashboard_powerbi/', dashboard_powerbi.as_view(), name='dashboard_powerbi')
+    path('dashboard_powerbi/', dashboard_powerbi.as_view(), name='dashboard_powerbi'),
+    path('eliminarEvento/', views.eliminarEvento, name='eliminarEvento'),
+    path('eliminar/<int:registro_id>/', views.eliminar_registro, name='eliminar_registro'),
 ]

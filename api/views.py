@@ -602,6 +602,7 @@ class DeudasPagos (APIView):
                     context = self.get_context_data('block', 'El método de pago no es válido', 'none', '')
                     return render(request, self.template_name, context)
                 try:
+                    print("INSERTANDO DATOS EN PAGO")
                     nuevoPago = Pago(id_pago=transaction_id,
                                      titulo=tituloF,
                                      descripcion=descripcionF,
@@ -613,6 +614,7 @@ class DeudasPagos (APIView):
                                      fk_usuario=User.objects.get(id = usuario_id),
                                     )
                     nuevoPago.save()
+                    print("EL DATO SE HA INSERTADO")
                     context = self.get_context_data('none', '', 'block', 'Los datos se han registrado correctamente.')
                     return render(request, self.template_name, context)
                 except IntegrityError:
@@ -1049,11 +1051,13 @@ class conversor(APIView):
         
 def eliminarEvento(request):
     if request.method == "POST":
+        idEvento = request.POST.get("id")
+        print("Recibiendo el ID: ", idEvento)
         # Configura las credenciales y la API
         calendar_service = get_calendar_service()
 
         # ID del evento que deseas eliminar
-        event_id = 'rhsipivkfav0f40d8vbsok9jg4'
+        event_id = idEvento
 
         # ID del calendario en el que se encuentra el evento
         calendar_id = 'primary'  # 'primary' representa el calendario principal del usuario
@@ -1061,10 +1065,11 @@ def eliminarEvento(request):
         try:
             calendar_service.events().delete(calendarId=calendar_id, eventId=event_id).execute()
             print(f'Evento con ID {event_id} eliminado con éxito.')
+            eliminar_registro(idEvento)
         except Exception as e:
             print(f'Ocurrió un error al eliminar el evento: {str(e)}')
         
-def eliminar_registro(request, registro_id):
+def eliminar_registro(registro_id):
     try:
         mi_registro = Pago.objects.get(id_pago=registro_id)
         mi_registro.delete()

@@ -591,7 +591,7 @@
               <!-- Hoverable Table rows -->
               <div class="card">
                 <h5 class="card-header">Eventos registrados</h5>
-                <div class="card-body">
+                <div class="card-body table-responsive">
                   <table class="table table-hover" id="datatablesSimple">
                       <thead>
                           <tr>
@@ -622,35 +622,35 @@
                           </tr>
                       </tfoot>
                       <tbody>
+                        {% for pago in pagos %}
                           <tr>
-                            {% for pago in pagos %}
-                              <td style="display: none;">{{ pago.id_pago }}</td>
-                              <td>{{ pago.titulo }}</td>
-                              <td>{{ pago.fechaInicio }}</td>
-                              <td>{{ pago.fechaTermino }}</td>
-                              <td>{{ pago.frecuencia }}</td>
-                              <td>{{ pago.monto }} {{ pago.fk_moneda }}</td>
-                              {% comment %} <td>{{ pago.fk_tipo.tipo_transaccion }}</td> {% endcomment %}
-                              <td>{{ pago.fk_cuenta.nombre_cuenta }}</td>
-                              <td>{{ pago.descripcion }}</td>
-                              <td>
-                                <div class="dropdown">
-                                  <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                    <i class="bx bx-dots-vertical-rounded"></i>
-                                  </button>
-                                  <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="javascript:void(0);"
-                                      ><i class="bx bx-edit-alt me-1"></i>Editar</a
-                                    >
-                                    <a class="dropdown-item" href="javascript:void(0);"
-                                      ><i class="bx bx-trash me-1"></i>Eliminar</a
-                                    >
-                                    <button class="eliminar-btn" data-id="{{ pago.id_pago }}">Eliminar</button>
-                                  </div>
+                            <td style="display: none;">{{ pago.id_pago }}</td>
+                            <td>{{ pago.titulo }}</td>
+                            <td>{{ pago.fechaInicio }}</td>
+                            <td>{{ pago.fechaTermino }}</td>
+                            <td>{{ pago.frecuencia }}</td>
+                            <td>{{ pago.monto }} {{ pago.fk_moneda }}</td>
+                            {% comment %} <td>{{ pago.fk_tipo.tipo_transaccion }}</td> {% endcomment %}
+                            <td>{{ pago.fk_cuenta.nombre_cuenta }}</td>
+                            <td>{{ pago.descripcion }}</td>
+                            <td>
+                              <div class="dropdown">
+                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                  <i class="bx bx-dots-vertical-rounded"></i>
+                                </button>
+                                <div class="dropdown-menu">
+                                  <a class="dropdown-item" href="javascript:void(0);"
+                                    ><i class="bx bx-edit-alt me-1"></i>Editar</a
+                                  >
+                                  <a class="dropdown-item" href="javascript:void(0);"
+                                    ><i class="bx bx-trash me-1"></i>Eliminar</a
+                                  >
+                                  <button class="eliminar-btn" data-id="{{ pago.id_pago }}">Eliminar</button>
                                 </div>
-                              </td>
-                            {% endfor %}
+                              </div>
+                            </td>
                           </tr>
+                          {% endfor %}
                       </tbody>
                   </table>
                 </div>
@@ -709,20 +709,24 @@
     <script>
       $(document).ready(function () {
         $(".eliminar-btn").click(function () {
-          var id = $(this).data("id_pago");
-          $.ajax({
-            type: "POST",
-            url: "/eliminar/"+var+"/",
-            data: { id: id, csrfmiddlewaretoken: '{{ csrf_token }}' },  // Asegúrate de incluir el token CSRF
-            success: function (data) {
-              // Procesa la respuesta de Django si es necesario
-              console.log(data);
-            },
-            error: function () {
-              // Maneja errores si es necesario
-              console.error("Error en la solicitud POST");
-            },
-          });
+          var id = $(this).data("id");
+          if (confirm("¿Estás seguro de que deseas eliminar este registro?")) {
+            $.ajax({
+                type: "POST",
+                url: "/eliminarEvento/",  // Ajusta la URL de tu vista de eliminación
+                data: { id: id, csrfmiddlewaretoken: '{{ csrf_token }}' },
+                success: function (data) {
+                    // Procesa la respuesta de Django si es necesario
+                    console.log(data);
+                    // Actualiza la interfaz de usuario si es necesario
+                    $(this).closest('tr').remove(); // Elimina la fila de la tabla
+                },
+                error: function () {
+                    // Maneja errores si es necesario
+                    console.error("Error en la solicitud POST");
+                },
+            });
+          }
         });
       });
       </script>

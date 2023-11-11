@@ -28,7 +28,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-+4_!6g_2+1zff
 # CAMBIAR POR FALSE O EL COMANDO EN EL DEPLOY DE RENDER (TRUE ES DEFAULT)
 DEBUG = 'RENDER' not in os.environ
 
-ALLOWED_HOSTS = []
+# Configuración de manejo de errores
+ADMINS = [('Tu Nombre', 'tu@email.com')]
+
+ALLOWED_HOSTS = ['finanzapp.onrender.com', '127.0.0.1']
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:

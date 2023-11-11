@@ -1052,7 +1052,6 @@ class conversor(APIView):
 def eliminarEvento(request):
     if request.method == "POST":
         idEvento = request.POST.get("id")
-        print("Recibiendo el ID: ", idEvento)
         # Configura las credenciales y la API
         calendar_service = get_calendar_service()
 
@@ -1078,6 +1077,27 @@ def eliminar_registro(registro_id):
         return HttpResponse("El registro no existe")
     except IntegrityError:
         return HttpResponse("El registro no puede ser eiminado porque se encuentra referenciado en otra parte.")
+    
+def actualizarEvento(request):
+    if request.methos == "POST":
+        calendar_service = get_calendar_service()
+        # Cree el evento
+        event = {
+            "summary": "Mi evento actualizado",
+            "description": "Esta es una descripción de mi evento actualizado",
+            "start": {
+                "dateTime": datetime.today().isoformat() + "T19:00:00-06:00",
+            },
+            "end": {
+                "dateTime": datetime.today().isoformat() + "T20:00:00-06:00",
+            },
+        }
+
+        # Actualiza el evento
+        response = calendar_service.events().update(calendarId="primary", eventId="1234567890", body=event).execute()
+
+        # Imprima la respuesta
+        print(response)
     
 def custom_404_view(request, exception):
     return render(request, '404.html', status=404)

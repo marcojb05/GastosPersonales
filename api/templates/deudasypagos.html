@@ -592,7 +592,7 @@
               <div class="card">
                 <h5 class="card-header">Eventos registrados</h5>
                 <div class="card-body table-responsive">
-                  <table class="table table-hover" id="datatablesSimple">
+                  <table class="table table-hover" id="eventos">
                       <thead>
                           <tr>
                             <th style="display: none;">ID</th>
@@ -639,13 +639,12 @@
                                   <i class="bx bx-dots-vertical-rounded"></i>
                                 </button>
                                 <div class="dropdown-menu">
-                                  <a class="dropdown-item" href="javascript:void(0);"
+                                  <a class="dropdown-item editar-btn" data-id="{{ pago.id_pago }}"
                                     ><i class="bx bx-edit-alt me-1"></i>Editar</a
                                   >
-                                  <a class="dropdown-item" href="javascript:void(0);"
+                                  <a class="dropdown-item eliminar-btn" data-id="{{ pago.id_pago }}"
                                     ><i class="bx bx-trash me-1"></i>Eliminar</a
                                   >
-                                  <button class="eliminar-btn" data-id="{{ pago.id_pago }}">Eliminar</button>
                                 </div>
                               </div>
                             </td>
@@ -731,5 +730,23 @@
       });
       </script>
     <!-- OBTENCIÓN DE DATOS PARA ELIMINACIÓN -->
+
+    <!-- OBTENCIÓN DE DATOS PARA ACTUALIZACIÓN -->
+    <script>
+      $(document).ready(function () {
+          // Captura el clic en el botón de edición
+          $(".editar-btn").click(function () {
+              var id = $(this).data('id');
+              // Abre la ventana modal de edición y carga los datos del registro
+              abrirVentanaModalDeEdicion(id);
+          });
+
+          // Función para abrir la ventana modal de edición
+          function abrirVentanaModalDeEdicion(id) {
+            confirm("¿Estás seguro de que deseas eliminar este registro?")
+          }
+      });
+    </script>
+    <!-- OBTENCIÓN DE DATOS PARA ACTUALIZACIÓN -->
   </body>
 </html>

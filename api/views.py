@@ -11,6 +11,7 @@ from django.contrib.auth.models import User  # Permite el registro
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.shortcuts import render
@@ -76,7 +77,7 @@ def signout(request):
     return redirect('login')
 
 # Iniciar sesión
-class signin(APIView):
+class signin(APIView, LoginRequiredMixin):
     def get(self, request):
         return render(request, 'login.html', {
             'form': AuthenticationForm
@@ -564,7 +565,7 @@ class Ahorros (APIView):
             return True
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
 class DeudasPagos (APIView):
     template_name = "deudasypagos.html"
     # MÉTODO GET

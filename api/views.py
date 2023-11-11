@@ -98,7 +98,7 @@ class signin(APIView, LoginRequiredMixin):
             return redirect('index')
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class Home (APIView):
     template_name = "index.html"
     # self es el equivalente del this en Java, hace referencia a sí mismo
@@ -111,7 +111,7 @@ class Home (APIView):
         return render(request, self.template_name)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class Cuenta (APIView):
     template_name = "cuenta.html"
 
@@ -122,7 +122,7 @@ class Cuenta (APIView):
         return render(request, self.template_name)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class Notificaciones (APIView):
     template_name = "notificaciones.html"
 
@@ -133,7 +133,7 @@ class Notificaciones (APIView):
         return render(request, self.template_name)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class Conexiones (APIView):
     template_name = "conexiones.html"
 
@@ -144,7 +144,7 @@ class Conexiones (APIView):
         return render(request, self.template_name)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class Movimientos (APIView):
     template_name = "movimientos.html"
 
@@ -209,7 +209,7 @@ class Movimientos (APIView):
         }
 
 # Ingresos del usuario
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class Ingresos (APIView):
     template_name = "ingresos.html"
     # MÉTODO GET
@@ -349,7 +349,7 @@ class Ingresos (APIView):
         }
         
 # Gastos del usuario
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class Gastos (APIView):
     template_name = "gastos.html"
 
@@ -458,7 +458,7 @@ class Gastos (APIView):
             return True
 
 # Ahorros del usuario
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class Ahorros (APIView):
     template_name = "ahorros.html"
 
@@ -565,7 +565,7 @@ class Ahorros (APIView):
             return True
 
 
-@method_decorator(login_required(login_url='/login/'), name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class DeudasPagos (APIView):
     template_name = "deudasypagos.html"
     # MÉTODO GET
@@ -718,7 +718,7 @@ class DeudasPagos (APIView):
     
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class Tarjetas(APIView):
     template_name = "Tarjetas.html"
     def get(self, request):
@@ -758,7 +758,7 @@ class Tarjetas(APIView):
                                                             'error': mensaje_error})
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class Metas (APIView):
     template_name = "metas.html"
 

@@ -26,12 +26,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-+4_!6g_2+1zff
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # CAMBIAR POR FALSE O EL COMANDO EN EL DEPLOY DE RENDER (TRUE ES DEFAULT)
-DEBUG = 'RENDER' not in os.environ
+DEBUG = True
 
-# Configuración de manejo de errores
-ADMINS = [('Tu Nombre', 'tu@email.com')]
-
-ALLOWED_HOSTS = ['finanzapp.onrender.com', '127.0.0.1']
+ALLOWED_HOSTS = []
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
@@ -151,7 +148,7 @@ if not DEBUG:
     # and creating unique names for each version so they can safely be cached forever.
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-LOGIN_URL = '/login/'
+LOGIN_URL = 'login'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -1101,9 +1101,6 @@ def actualizarEvento(request):
         # Imprima la respuesta
         print(response)
     
-def custom_404_view(request, exception):
-    return render(request, '404.html', status=404)
-
 class error404(APIView):
     def get(self, request):
         return render(request, '404.html', status=404)

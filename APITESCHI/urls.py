@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
-from api.views import Home, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, dashboard, conversor, error404, dashboard_powerbi
+from api.views import Home, signin, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, dashboard, conversor, error404, dashboard_powerbi
 from api import views
 from django.views.generic.base import RedirectView
 from django.conf.urls import handler404
@@ -30,7 +30,7 @@ urlpatterns = [
     #login/: es lo que se verá en el navegador y sin extensión
     #Login.as_view(): Es la importación de la plantilla, es decir, la muestra, transforma y hace visible
     #name='login': Es el nombre que se utilizará para navegar entre situaciones
-    path('login/', views.signin, name='login'),
+    path('login/', signin.as_view(), name='login'),
     path('logout/', views.signout, name='logout'),
     path('reestablecer/', views.Reestablecer, name="reestablecer"),
     path('cuenta/', Cuenta.as_view(), name="cuenta"),

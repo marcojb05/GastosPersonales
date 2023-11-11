@@ -76,12 +76,13 @@ def signout(request):
     return redirect('login')
 
 # Iniciar sesión
-def signin(request):
-    if request.method == "GET":
+class signin(APIView):
+    def get(self, request):
         return render(request, 'login.html', {
             'form': AuthenticationForm
         })
-    else:
+        
+    def post(self, request):
         user = authenticate(request,
                             username=request.POST['username'],
                             password=request.POST['password']

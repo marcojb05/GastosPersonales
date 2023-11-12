@@ -59,5 +59,5 @@ urlpatterns = [
     path('error404/', error404.as_view(), name='error404'),
     path('dashboard_powerbi/', dashboard_powerbi.as_view(), name='dashboard_powerbi'),
     path('eliminarEvento/', views.eliminarEvento, name='eliminarEvento'),
-    path('eliminar/<int:registro_id>/', views.eliminar_registro, name='eliminar_registro'),
+    path('actualizarEvento/', views.actualizarEvento, name='actualizarEvento'),
 ]

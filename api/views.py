@@ -28,8 +28,9 @@ from django.conf import settings
 from django.http import JsonResponse
 # Calendario
 from .calendar_setup import get_calendar_service
-from googleapiclient.discovery import build
-from google.oauth2.service_account import Credentials
+# from oauthlib.oauth2.rfc6749.errors import AccessDeniedError
+# from google.auth.exceptions import RefreshError
+# from google.auth.exceptions import AccessDeniedError
 
 # Create your views here.
 
@@ -622,6 +623,13 @@ class DeudasPagos (APIView):
                 except IntegrityError:
                     context = self.get_context_data('block', 'Error, duplicación de datos', 'none', '')
                     return render(request, self.template_name, context)
+                # except errors.AccessDeniedError as e:
+                #     # Manejar el error de acceso denegado aquí
+                #     context = self.get_context_data('block', 'AccessDeniedError. Asegúrate de otorgar los permisos necesarios.', 'none', '')
+                #     return render(request, self.template_name, context)
+                # except RefreshError as e:
+                #     context = self.get_context_data('block', 'RefreshError. Asegúrate de otorgar los permisos necesarios.', 'none', '')
+                #     return render(request, self.template_name, context)
                 except Exception as e:
                     context = self.get_context_data('block', f"Los datos ingresados no son válidos: {str(e)}", 'none', '')
                     return render(request, self.template_name, context)
@@ -708,15 +716,10 @@ class DeudasPagos (APIView):
             ).execute()
             print("Evento creado con éxito!")
             print("ID: ", event_result['id'])
-            print("Título: ", event_result['summary'])
-            print("Descripción: ", event_result["description"])
-            print("Empieza en: ", event_result["start"])
-            print("Termina en: ", event_result["end"])
             return event_result['id']
         except Exception:
             return False
     
-
 
 @method_decorator(login_required, name='dispatch')
 class Tarjetas(APIView):
@@ -1081,26 +1084,72 @@ def eliminar_registro(registro_id):
         return HttpResponse("El registro no puede ser eiminado porque se encuentra referenciado en otra parte.")
     
 def actualizarEvento(request):
-    if request.methos == "POST":
+    if request.method == "POST":
+        print("ACTUALIZANDO EVENTO...")
         calendar_service = get_calendar_service()
         # Cree el evento
+        fechaInicio = datetime(2023, 11, 12, 10, 0)
+        fechaTermino = datetime(2023, 11, 12, 11, 0)
+        start_date = fechaInicio.isoformat()
+        end_date = fechaTermino.isoformat()
+        
         event = {
             "summary": "Mi evento actualizado",
             "description": "Esta es una descripción de mi evento actualizado",
-            "start": {
-                "dateTime": datetime.today().isoformat() + "T19:00:00-06:00",
-            },
-            "end": {
-                "dateTime": datetime.today().isoformat() + "T20:00:00-06:00",
-            },
+            "start": {"dateTime": start_date, "timeZone": 'America/Mexico_City'},
+            "end": {"dateTime": end_date, "timeZone": 'America/Mexico_City'},
         }
 
-        # Actualiza el evento
-        response = calendar_service.events().update(calendarId="primary", eventId="1234567890", body=event).execute()
-
-        # Imprima la respuesta
-        print(response)
+        try:
+            # Actualiza el evento
+            calendar_service.events().update(calendarId="primary", eventId="dgq27d2eq1otco1oh3vrbuvt3k", body=event).execute()
+            print("EL EVENTO HA SIDO ACTUALIZADO")
+        except Exception as e:
+            print(f'OCURRIÓ UN ERROR AL ACTUALIZAR EL EVENTO: {str(e)}')
     
+    elif request.method == "GET" and 'id_pago' in request.GET:
+        # Obtiene el usuario y su ID
+        usuario = request.user
+        usuario_id = usuario.id
+        
+        monedas = Moneda.objects.all()
+        monedas_list = [{'id': moneda.id_moneda, 'nombre': moneda.nombre_moneda} for moneda in monedas]
+        
+        # Consultas para ingresos
+        categorias = Categoria.objects.filter(fk_tipo='TP-GAS')
+        categorias_list = [{'id': categoria.id_categoria, 'nombre': categoria.nombre} for categoria in categorias]
+        
+        # Consulta para retornar las carteras del usuario.
+        cartera = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-EFEC',
+            fk_usuario=usuario_id
+        )
+        carteras_list = [{'id': carteras.id_cuenta, 'nombre': carteras.nombre_cuenta} for carteras in cartera]
+        
+        # Consulta para retornar las tarjetas del usuario.
+        tarjeta = Tarjeta.objects.filter(
+            fk_metodo_pago__id_metodotipo='MP-TARJ',
+            fk_usuario=usuario_id
+        )
+        tarjetas_list = [{'id': tarjetas.id_cuenta, 'nombre': tarjetas.nombre_cuenta} for tarjetas in tarjeta]
+        data = {
+            'id_pago': '8i4ecdl40aqjuf2vv9f93kbrqo',
+            'titulo': 'Título del Pago',
+            'fechaInicio': '2023-11-11 20:54:00:00',
+            'fechaTermino': '2023-11-11 21:54:00:00',
+            'frecuencia': 'unico',
+            'monto': 100.00,
+            'monedas': monedas_list,
+            'carteras': carteras_list,
+            'tarjetas': tarjetas_list,
+            'fk_moneda': 'USD',
+            'categoria': categorias_list,
+            'fk_cuenta': 'Cuenta de ejemplo',
+            'descripcion': 'Descripción del pago',
+        }
+    # Devuelve los datos como respuesta JSON
+    return JsonResponse(data)
+            
 class error404(APIView):
     def get(self, request):
         return render(request, '404.html', status=404)

@@ -62,7 +62,7 @@
 
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-    <script src="../assets/js/config.js"></script>
+    <script src="{% static 'assets/js/config.js'%}"></script>
   </head>
 
   <body>
@@ -90,7 +90,7 @@
               <form id="formAuthentication" class="mb-3" action="/login/" method="POST">
                 {% csrf_token %}
                 <div class="mb-3">
-                  <label for="email" class="form-label">Email o Usuario</label>
+                  <label for="username" class="form-label">Email o Usuario</label>
                   <input
                     type="text"
                     class="form-control"

@@ -1,4 +1,4 @@
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 from sqlite3 import IntegrityError
 from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
@@ -28,6 +28,8 @@ from django.conf import settings
 from django.http import JsonResponse
 # Calendario
 from .calendar_setup import get_calendar_service
+from django.views.decorators.csrf import csrf_exempt
+import pytz
 # from oauthlib.oauth2.rfc6749.errors import AccessDeniedError
 # from google.auth.exceptions import RefreshError
 # from google.auth.exceptions import AccessDeniedError
@@ -719,7 +721,6 @@ class DeudasPagos (APIView):
             return event_result['id']
         except Exception:
             return False
-    
 
 @method_decorator(login_required, name='dispatch')
 class Tarjetas(APIView):
@@ -1083,72 +1084,96 @@ def eliminar_registro(registro_id):
     except IntegrityError:
         return HttpResponse("El registro no puede ser eiminado porque se encuentra referenciado en otra parte.")
     
+@csrf_exempt
 def actualizarEvento(request):
     if request.method == "POST":
         print("ACTUALIZANDO EVENTO...")
-        calendar_service = get_calendar_service()
-        # Cree el evento
-        fechaInicio = datetime(2023, 11, 12, 10, 0)
-        fechaTermino = datetime(2023, 11, 12, 11, 0)
-        start_date = fechaInicio.isoformat()
-        end_date = fechaTermino.isoformat()
-        
-        event = {
-            "summary": "Mi evento actualizado",
-            "description": "Esta es una descripción de mi evento actualizado",
-            "start": {"dateTime": start_date, "timeZone": 'America/Mexico_City'},
-            "end": {"dateTime": end_date, "timeZone": 'America/Mexico_City'},
-        }
+        print("EL ID ES: ",request.POST.get('idEditar'))
+        id_pago = request.POST.get('idEditar')
+        # Recuperar el objeto Pago
+        evento = get_object_or_404(Pago, id_pago=id_pago)
+        print("EVENTO: ", evento)
 
         try:
-            # Actualiza el evento
-            calendar_service.events().update(calendarId="primary", eventId="dgq27d2eq1otco1oh3vrbuvt3k", body=event).execute()
+            # Actualizar los campos según los datos recibidos
+        
+            print("ACTUALIZANDO")
+            evento.titulo = request.POST['tituloEditar']
+            evento.monto = request.POST['montoEditar']
+            evento.fechaInicio = request.POST['fechaInicioEditar']
+            evento.fechaTermino = request.POST['fechaTerminoEditar']
+            evento.frecuencia = request.POST['frecuenciaEditar']
+            evento.descripcion = request.POST['descripcionEditar']
+            # Guardar los cambios
+            evento.save()
+            print("SE ACTUALIZÓ")
+            # Actualiza el evento en G-Calendar
+            calendar_service = get_calendar_service()
+            # Cree el evento
+            """ FORMATO DE FECHA EN ISO """
+            fechaInicio = datetime.fromisoformat(request.POST['fechaInicioEditar'])
+            fechaTermino = datetime.fromisoformat(request.POST['fechaTerminoEditar'])
+            # Define la zona horaria objetivo (UTC-6)
+            zona_horaria_objetivo = pytz.timezone('America/Mexico_City')
+
+            # Agrega la zona horaria a la fecha proporcionada
+            fechaInicio_utc6 = fechaInicio.replace(tzinfo=zona_horaria_objetivo)
+            fechaTermino_utc6 = fechaTermino.replace(tzinfo=zona_horaria_objetivo)
+            # Convierte la fecha a UTC (si es necesario)
+            fechaInicioF = fechaInicio_utc6.astimezone(pytz.utc)
+            fechaTerminoF = fechaTermino_utc6.astimezone(pytz.utc)
+            ############################
+            fechaInicio = datetime.fromisoformat(request.POST['fechaInicioEditar'])
+            fechaTermino = datetime.fromisoformat(request.POST['fechaTerminoEditar'])
+            fechaInicioISO = fechaInicio.isoformat()
+            fechaTerminoISO = fechaTermino.isoformat()
+            """ FORMATO DE FECHA EN ISO """
+            
+            print("FECHA INICIO DE EDICIÓN: ", fechaInicioISO)
+            print("FECHA TÉRMINO DE EDICIÓN: ", fechaTerminoISO)
+            
+            event = {
+                "summary": request.POST['tituloEditar'],
+                "description": request.POST['descripcionEditar'],
+                "start": {"dateTime": fechaInicioISO, "timeZone": 'America/Mexico_City'},
+                "end": {"dateTime": fechaTerminoISO, "timeZone": 'America/Mexico_City'},
+            }
+            calendar_service.events().update(calendarId="primary", eventId=id_pago, body=event).execute()
             print("EL EVENTO HA SIDO ACTUALIZADO")
         except Exception as e:
             print(f'OCURRIÓ UN ERROR AL ACTUALIZAR EL EVENTO: {str(e)}')
+        
+        return JsonResponse({'status': 'success', 'message': 'Datos guardados correctamente'})
     
     elif request.method == "GET" and 'id_pago' in request.GET:
         # Obtiene el usuario y su ID
         usuario = request.user
         usuario_id = usuario.id
         
-        monedas = Moneda.objects.all()
-        monedas_list = [{'id': moneda.id_moneda, 'nombre': moneda.nombre_moneda} for moneda in monedas]
-        
-        # Consultas para ingresos
-        categorias = Categoria.objects.filter(fk_tipo='TP-GAS')
-        categorias_list = [{'id': categoria.id_categoria, 'nombre': categoria.nombre} for categoria in categorias]
-        
-        # Consulta para retornar las carteras del usuario.
-        cartera = Tarjeta.objects.filter(
-            fk_metodo_pago__id_metodotipo='MP-EFEC',
+        # Consulta para retornar el evento del usuario.
+        eventos = Pago.objects.filter(
+            id_pago=request.GET.get('id_pago'),
             fk_usuario=usuario_id
         )
-        carteras_list = [{'id': carteras.id_cuenta, 'nombre': carteras.nombre_cuenta} for carteras in cartera]
+        print(eventos)
+        evento_list = [{'id_pago': evento.id_pago,
+                        'titulo': evento.titulo,
+                        'descripcion': evento.descripcion,
+                        'monto': evento.monto,
+                        'fechaInicio': evento.fechaInicio,
+                        'fechaTermino': evento.fechaTermino,
+                        'frecuencia': evento.frecuencia,
+                        'fk_cuenta': {'id_cuenta': evento.fk_cuenta.id_cuenta},
+                        } for evento in eventos]
         
-        # Consulta para retornar las tarjetas del usuario.
-        tarjeta = Tarjeta.objects.filter(
-            fk_metodo_pago__id_metodotipo='MP-TARJ',
-            fk_usuario=usuario_id
-        )
-        tarjetas_list = [{'id': tarjetas.id_cuenta, 'nombre': tarjetas.nombre_cuenta} for tarjetas in tarjeta]
         data = {
-            'id_pago': '8i4ecdl40aqjuf2vv9f93kbrqo',
-            'titulo': 'Título del Pago',
             'fechaInicio': '2023-11-11 20:54:00:00',
             'fechaTermino': '2023-11-11 21:54:00:00',
-            'frecuencia': 'unico',
-            'monto': 100.00,
-            'monedas': monedas_list,
-            'carteras': carteras_list,
-            'tarjetas': tarjetas_list,
             'fk_moneda': 'USD',
-            'categoria': categorias_list,
-            'fk_cuenta': 'Cuenta de ejemplo',
-            'descripcion': 'Descripción del pago',
+            'evento': evento_list,
         }
-    # Devuelve los datos como respuesta JSON
-    return JsonResponse(data)
+        # Devuelve los datos como respuesta JSON
+        return JsonResponse(data)
             
 class error404(APIView):
     def get(self, request):

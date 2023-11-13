@@ -329,6 +329,19 @@ class Ingresos (APIView):
         else:
             return True
         
+def eliminarTransaccion(request):
+    if request.method == "POST":
+        idTransaccion = request.POST.get("id")
+        print("TRANSACCIÓN: ", idTransaccion)
+        try:
+            transaccion = Transaccion.objects.get(id_transaccion=idTransaccion)
+            transaccion.delete()
+            return HttpResponse("Registro eliminado con éxito")
+        except Pago.DoesNotExist:
+            return HttpResponse("El registro no existe")
+        except IntegrityError:
+            return HttpResponse("El registro no puede ser eiminado porque se encuentra referenciado en otra parte.")
+            
         
 # Gastos del usuario
 @method_decorator(login_required, name='dispatch')

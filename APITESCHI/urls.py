@@ -57,4 +57,5 @@ urlpatterns = [
     path('dashboard_powerbi/', dashboard_powerbi.as_view(), name='dashboard_powerbi'),
     path('eliminarEvento/', views.eliminarEvento, name='eliminarEvento'),
     path('actualizarEvento/', views.actualizarEvento, name='actualizarEvento'),
+    path('eliminarTransaccion/', views.eliminarTransaccion, name='eliminarTransaccion'),
 ]

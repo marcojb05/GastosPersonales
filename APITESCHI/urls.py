@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import include, path, re_path
-from api.views import Home, signin, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, dashboard, conversor, error404, dashboard_powerbi
+from api.views import Home, signin, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, dashboard, Conversor, error404, dashboard_powerbi
 from api import views
 from django.views.generic.base import RedirectView
 from django.conf.urls import handler404, handler500
@@ -55,7 +55,7 @@ urlpatterns = [
     path('dashboard/', dashboard.as_view(), name="dashboard"),
     # path('get-exchange-rates/', views.get_exchange_rates, name='get_exchange_rates'),
     path('exchange-rate/', views.exchange_rate, name='exchange_rate'),
-    path('conversor/', conversor.as_view(), name='conversor'),
+    path('conversor/', Conversor.as_view(), name='conversor'),
     path('error404/', error404.as_view(), name='error404'),
     path('dashboard_powerbi/', dashboard_powerbi.as_view(), name='dashboard_powerbi'),
     path('eliminarEvento/', views.eliminarEvento, name='eliminarEvento'),

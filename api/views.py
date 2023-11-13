@@ -981,7 +981,7 @@ def get_exchange_rates(request):
         else:
             return JsonResponse({'error': 'No se pudieron obtener las tasas de cambio.'}, status=500)
 
-def exchange_rate(request):
+def exchange_rate():
     try:
         api_key = settings.OPEN_EXCHANGE_RATES_API_KEY
         base_currency = 'USD'
@@ -997,48 +997,47 @@ def exchange_rate(request):
             data = {}
     except requests.RequestException as e:
         data = {}
+    
+    return data
 
-    return render(request, 'exchange_rate.html', {'data': data})
+    #return render(request, 'exchange_rate.html', {'data': data})
 
-class conversor(APIView):
+class Conversor(APIView):
     template_name = "conversor.html"
 
-    # MÉTODO GET
     def get(self, request):
-        context = self.get_context_data('none', '')
-        return render(request, self.template_name, context)
-
-    # MÉTODO POST
-    def post(self, request):
-        #Comprueba que estén los datos requeridos.
-        if self.verifica() == False:
-            context = self.get_context_data('block', 'Todos los campos son obligatorios.')
-            return render(request, self.template_name, context)
+        if 'monedaDe' in request.GET:
+            if self.verifica() == False:
+                return JsonResponse({'resultado': 'Todos los campos son obligatorios.'})
+            else:
+                monedaDe = request.GET['monedaDe']
+                monedaA = request.GET['monedaA']
+                divisas = exchange_rate()
+                if monedaDe in divisas['rates'] and monedaA in divisas['rates']:
+                    try:
+                        if request.GET['convertir'].isdigit():
+                            convertir = float(request.GET['convertir'])
+                            divisaDe = divisas['rates'][monedaDe]
+                            divisaA = divisas['rates'][monedaA]
+                            
+                            monto_en_dolares = convertir / divisaDe
+                            conversion = monto_en_dolares * divisaA
+                            
+                            return JsonResponse({'resultado': conversion})
+                        else:
+                            return JsonResponse({'resultado': 'Solo valores numéricos.'})
+                    except ValueError:
+                        return JsonResponse({'resultado': 'Error de validación.'})
+                else:
+                    return JsonResponse({'resultado': 'Divisa no válida.'})
         else:
-            # OBTTENER LOS DATOS POR POST
-            monedaDe = request.POST['monedaDe']
-            monedaA = request.POST['monedaA']
-            convertir = request.POST['convertir']
-            
-            # GENERACIÓN DE ID DE TRANSACCIÓN (INGRESO)
-            
-            try:
+            context = self.get_context_data('none', '')
+            return render(request, self.template_name, context)
                 
-                context = self.get_context_data('none', '')
-                return render(request, self.template_name, context)
-            except IntegrityError:
-                context = self.get_context_data('block', 'Error, se presentó una duplicación de datos')
-                return render(request, self.template_name, context)
-            except Exception as e:
-                context = self.get_context_data('block', f"Los datos ingresados no son válidos: {str(e)}")
-                return render(request, self.template_name, context)
-    
     # Realiza las consultas y renderiza en los campos
     def get_context_data(self, mensajeError, error):
-        
         # Consulta las monedas registradas en la BD
         monedas = Moneda.objects.all()
-        
         return {
             'monedas': monedas,
             'mostrarError': mensajeError,
@@ -1047,14 +1046,14 @@ class conversor(APIView):
 
     # Verifica que existan los campos del HTML
     def verifica(self):
-        if ('monedaDe' not in self.request.POST or
-            'monedaA' not in self.request.POST or
-            'convertir' not in self.request.POST
+        if ('monedaDe' not in self.request.GET or
+            'monedaA' not in self.request.GET or
+            'convertir' not in self.request.GET
             ):
             return False
         else:
             return True
-        
+    
 def eliminarEvento(request):
     if request.method == "POST":
         idEvento = request.POST.get("id")

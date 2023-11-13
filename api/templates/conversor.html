@@ -62,6 +62,8 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{%static 'assets/js/config.js'%}"></script>
+    <!-- JQUERY -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   </head>
 
   <body>
@@ -358,7 +360,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                       </div>
                       <div class="card-body">
-                        <form class="mb-3" action="/conversor/" method="POST">
+                        <form id="conversion">
                           {% csrf_token %}
                           <div class="row">
                             <div class="mb-3 col-md-6">
@@ -369,7 +371,6 @@
                                     name="monedaDe"
                                     aria-label="Selecciona el tipo de moneda"
                                     required>
-                                    <option selected value="">Selecciona el tipo de moneda</option>
                                     {% for moneda in monedas %}
                                         <option value="{{ moneda.id_moneda }}">{{ moneda.id_moneda }} - {{moneda.nombre_moneda }}</option>
                                     {% endfor %}
@@ -381,6 +382,8 @@
                                     placeholder="0.00"
                                     id="convertir"
                                     name="convertir"
+                                    value=0
+                                    step="any"
                                     required
                                 />
                               </div>
@@ -393,19 +396,17 @@
                                     name="monedaA"
                                     aria-label="Selecciona el tipo de moneda"
                                     required>
-                                    <option selected value="">Selecciona el tipo de moneda</option>
                                     {% for moneda in monedas %}
                                         <option value="{{ moneda.id_moneda }}">{{ moneda.id_moneda }} - {{moneda.nombre_moneda }}</option>
                                     {% endfor %}
                                 </select>
                                 <input
-                                    type="number"
-                                    min="0"
+                                    type="text"
                                     class="form-control form-control-lg"
                                     placeholder="0.00"
                                     id="convertido"
                                     name="convertido"
-                                    required
+                                    step="any"
                                     readonly
                                 />
                               </div>
@@ -463,5 +464,45 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <!-- OBTENCIÓN DE DATOS PARA CONVERSIÓN -->
+    <script>
+      $(document).ready(function () {
+          // Asegúrate de ejecutar el código después de que el DOM haya cargado
+  
+          // Agrega un evento de escucha al formulario
+          $('#conversion').submit(function (event) {
+              // Evita que el formulario se envíe de forma predeterminada
+              event.preventDefault();
+  
+              // Obtiene los valores del formulario
+              var monedaDe = $('#monedaDe').val();
+              var monedaA = $('#monedaA').val();
+              var convertir = $('#convertir').val();
+  
+              // Realiza la solicitud AJAX
+              $.ajax({
+                  type: 'GET',
+                  url: '/conversor/',  // Reemplaza esto con la ruta de tu vista en Django
+                  data: {
+                      monedaDe: monedaDe,
+                      monedaA: monedaA,
+                      convertir: convertir
+                  },
+                  success: function (data) {
+                      // Maneja la respuesta exitosa
+                      // Puedes actualizar el valor de '#convertido' con la respuesta si es necesario
+                      $('#convertido').val(data.resultado);
+                      console.log('Respuesta exitosa:', data);
+                  },
+                  error: function (error) {
+                      // Maneja el error
+                      console.error('Error:', error);
+                  }
+              });
+          });
+      });
+    </script>  
+    <!-- OBTENCIÓN DE DATOS PARA CONVERSIÓN -->
   </body>
 </html>

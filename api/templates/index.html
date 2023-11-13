@@ -97,6 +97,27 @@
               </a>
             </li>
 
+            <!---->
+            <li class="menu-item">
+              <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class='menu-icon bx bxs-dashboard'></i>
+                <div data-i18n="Layouts">Encuesta de satisfacción</div>
+              </a>
+              <ul class="menu-sub">
+                <li class="menu-item">
+                  <a href="{% url 'dashboard'%}" class="menu-link">
+                    <div data-i18n="Without menu">Dashboard</div>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="{% url 'dashboard_powerbi'%}" class="menu-link">
+                    <div data-i18n="Without navbar">Dashboard PowerBI</div>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <!---->
+
             <!-- Layouts -->
             <li class="menu-item">
               <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -136,6 +157,13 @@
                   </a>
                 </li>
               </ul>
+            </li>
+
+            <li class="menu-item">
+              <a href="{% url 'conversor'%}" class="menu-link">
+                <i class='menu-icon tf-icons bx bxs-bank'></i>
+                <div data-i18n="Analytics">Conversión de divisas</div>
+              </a>
             </li>
 
             <li class="menu-header small text-uppercase">

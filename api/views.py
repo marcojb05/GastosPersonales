@@ -966,21 +966,6 @@ class dashboard(APIView):
         return render(request, self.template_name)
 
 # CONEXIÓN CON API OPEN EXCHANGE RATE (CONVERSIÓN DE DIVISAS)
-def get_exchange_rates(request):
-    if request.GET:
-        api_key = '051f01d6b07d4ea5997f2a21d8c4c14f'  # Clave de API
-        base_currency = 'USD'
-        symbols = 'EUR,GBP'
-
-        url = f"https://openexchangerates.org/api/latest.json?app_id={api_key}&base={base_currency}&symbols={symbols}"
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            data = response.json()
-            return JsonResponse(data)
-        else:
-            return JsonResponse({'error': 'No se pudieron obtener las tasas de cambio.'}, status=500)
-
 def exchange_rate():
     try:
         api_key = settings.OPEN_EXCHANGE_RATES_API_KEY
@@ -1173,12 +1158,6 @@ def actualizarEvento(request):
         }
         # Devuelve los datos como respuesta JSON
         return JsonResponse(data)
-            
-class error404(APIView):
-    def get(self, request):
-        return render(request, '404.html', status=404)
-    def post(self, request):
-        return render(request, '404.html', status=404)
 
 class dashboard_powerbi(APIView):
     def get(self, request):

@@ -35,6 +35,8 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{% static 'assets/img/favicon/favicon.ico'%}" />
 
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -400,7 +402,7 @@
                                 required>
                                 <option selected value="">Selecciona el tipo de moneda</option>
                                 {% for moneda in monedas %}
-                                    <option value="{{ moneda.id_moneda }}">{{ moneda.nombre_moneda }}</option>
+                                    <option value="{{ moneda.id_moneda }}">{{ moneda.id_moneda }} - {{ moneda.nombre_moneda }}</option>
                                 {% endfor %}
                               </select>
                             </div>
@@ -496,67 +498,52 @@
                   </div>
                 </div>
               </div><hr>
+              
+              <!-- Hoverable Table rows -->
               <div class="card">
-                <!-- Expense Overview -->
-                <div>
-                  <div>
-                    <div class="card-header">
-                      <ul class="nav nav-pills" role="tablist">
-                        <li class="nav-item">
-                          <button
-                            type="button"
-                            class="nav-link active"
-                            role="tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#navs-tabs-line-card-income"
-                            aria-controls="navs-tabs-line-card-income"
-                            aria-selected="true"
-                          >
-                            Income
-                          </button>
-                        </li>
-                        <li class="nav-item">
-                          <button type="button" class="nav-link" role="tab">Expenses</button>
-                        </li>
-                        <li class="nav-item">
-                          <button type="button" class="nav-link" role="tab">Profit</button>
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="card-body px-0">
-                      <div class="tab-content p-0">
-                        <div class="tab-pane fade show active" id="navs-tabs-line-card-income" role="tabpanel">
-                          <div class="d-flex p-4 pt-3">
-                            <div class="avatar flex-shrink-0 me-3">
-                              <img src="{% static 'assets/img/icons/unicons/wallet.png'%}" alt="User" />
-                            </div>
-                            <div>
-                              <small class="text-muted d-block">Total Balance</small>
-                              <div class="d-flex align-items-center">
-                                <h6 class="mb-0 me-1">$459.10</h6>
-                                <small class="text-success fw-semibold">
-                                  <i class="bx bx-chevron-up"></i>
-                                  42.9%
-                                </small>
-                              </div>
+                <h5 class="card-header">Eventos registrados</h5>
+                <div class="card-body table-responsive">
+                  <table class="table table-hover" id="datatablesSimple">
+                    <thead>
+                      <tr>
+                        <th style="display: none;">ID</th>
+                        <th>Concepto</th>
+                        <th>Fecha</th>
+                        <th>Cantidad</th>
+                        <th>Tipo de operación</th>
+                        <th>Método de pago</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                      {% for ingreso in ingresos %}
+                      <tr>
+                        <td style="display: none;">{{ ingreso.id_transaccion }}</td>
+                        <td>{{ ingreso.descripcion }}</td>
+                        <td>{{ ingreso.fecha }}</td>
+                        <td>{{ ingreso.fk_moneda.simbolo_moneda }}{{ ingreso.monto }} {{ ingreso.fk_moneda.id_moneda }}</td>
+                        <td>{{ ingreso.fk_tipo.tipo_transaccion }}</td>
+                        <td>{{ ingreso.fk_cuenta.nombre_cuenta }}</td>
+                        <td>
+                          <div class="dropdown">
+                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                              <i class="bx bx-dots-vertical-rounded"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                              <a class="dropdown-item editar-btn" data-id="{{ pago.id_pago }}">
+                                <i class="bx bx-edit-alt me-1"></i>Editar
+                              </a>
+                              <a class="dropdown-item" href="javascript:void(0);">
+                                <i class="bx bx-trash me-1"></i>Eliminar
+                              </a>
                             </div>
                           </div>
-                          <div id="incomeChart"></div>
-                          <div class="d-flex justify-content-center pt-4 gap-2">
-                            <div class="flex-shrink-0">
-                              <div id="expensesOfWeek"></div>
-                            </div>
-                            <div>
-                              <p class="mb-n1 mt-1">Expenses This Week</p>
-                              <small class="text-muted">$39 less than last week</small>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
                 </div>
-                <!--/ Expense Overview -->
               </div>
               <!--/ Hoverable Table rows -->
             </div>
@@ -582,6 +569,9 @@
     </div>
     <!-- / Layout wrapper -->
 
+    <!-- DATATABLES -->
+    <script src="{% static 'js/datatables.js'%}"></script>
+    <script src="{% static 'js/datatables-simple-demo.js'%}"></script>
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->

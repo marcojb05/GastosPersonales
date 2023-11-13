@@ -294,11 +294,21 @@ class Ingresos (APIView):
             fk_metodo_pago__id_metodotipo='MP-TARJ',
             fk_usuario=usuario_id
         )
+        
+        # Para las tablas
+        # Consulta las transacciones según las fechas y el usuario
+        ingresos = Transaccion.objects.filter(
+            Q(id_transaccion__startswith='I') &
+            Q(fk_usuario=usuario_id)
+        )
+        print("TRANSACCIÓN: ",ingresos)
+        
         return {
             'monedas': monedas,
             'categorias': categorias,
             'carteras': carteras,
             'tarjetas': tarjetas,
+            'ingresos': ingresos,
             'mostrarError': mensajeError,
             'error': error,
             'mostrarMensaje': mostrarMensaje,
@@ -319,37 +329,6 @@ class Ingresos (APIView):
         else:
             return True
         
-    def get_context_data(self, mensajeError, error, mostrarMensaje, mensaje):
-         # Obtiene el usuairo y su ID
-        usuario = self.request.user
-        usuario_id = usuario.id
-        
-        # Consulta las monedas registradas en la BD
-        monedas = Moneda.objects.all()
-        # Consultas para ingresos
-        categorias = Categoria.objects.filter(fk_tipo='TP-ING')
-        
-        # Consulta para retornar las carteras del usuario.
-        carteras = Tarjeta.objects.filter(
-            fk_metodo_pago__id_metodotipo='MP-EFEC',
-            fk_usuario=usuario_id
-        )
-        
-        # Consulta para retornar las tarjetas del usuario.
-        tarjetas = Tarjeta.objects.filter(
-            fk_metodo_pago__id_metodotipo='MP-TARJ',
-            fk_usuario=usuario_id
-        )
-        return {
-            'monedas': monedas,
-            'categorias': categorias,
-            'carteras': carteras,
-            'tarjetas': tarjetas,
-            'mostrarError': mensajeError,
-            'error': error,
-            'mostrarMensaje': mostrarMensaje,
-            'mensaje': mensaje,
-        }
         
 # Gastos del usuario
 @method_decorator(login_required, name='dispatch')

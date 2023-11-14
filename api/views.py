@@ -301,7 +301,6 @@ class Ingresos (APIView):
             Q(id_transaccion__startswith='I') &
             Q(fk_usuario=usuario_id)
         )
-        print("TRANSACCIÓN: ",ingresos)
         
         return {
             'monedas': monedas,
@@ -427,11 +426,19 @@ class Gastos (APIView):
             fk_metodo_pago__id_metodotipo='MP-TARJ',
             fk_usuario=usuario_id
         )
+        
+        # Para las tablas
+        # Consulta las transacciones según las fechas y el usuario
+        ingresos = Transaccion.objects.filter(
+            Q(id_transaccion__startswith='G') &
+            Q(fk_usuario=usuario_id)
+        )
         return {
             'monedas': monedas,
             'categorias': categorias,
             'carteras': carteras,
             'tarjetas': tarjetas,
+            'ingresos': ingresos,
             'mostrarError': mensajeError,
             'error': error,
             'mostrarMensaje': mostrarMensaje,

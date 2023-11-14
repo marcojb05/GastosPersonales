@@ -33,26 +33,34 @@
     <meta name="description" content="" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{% static 'assets/img/favicon/favicon.ico'%}" />
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/img/favicon/favicon.ico'%}"/>
+
+    <!-- CSS Datatable -->
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
 
     <!-- Icons. Uncomment required icon fonts -->
-    <link rel="stylesheet" href="{%static 'assets/vendor/fonts/boxicons.css'%}" />
+    <link
+      rel="stylesheet"
+      href="{%static 'assets/vendor/fonts/boxicons.css'%}"
+    />
 
     <!-- Core CSS -->
-    <link rel="stylesheet" href="{%static 'assets/vendor/css/core.css'%}" class="template-customizer-core-css" />
-    <link rel="stylesheet" href="{%static 'assets/vendor/css/theme-default.css'%}" class="template-customizer-theme-css" />
+    <link
+      rel="stylesheet"
+      href="{%static 'assets/vendor/css/core.css'%}"
+      class="template-customizer-core-css"
+    />
+    <link rel="stylesheet" href="{%static 'assets/vendor/css/theme-default.css'%}" class="template-customizer-theme-css"/>
     <link rel="stylesheet" href="{%static 'assets/css/demo.css'%}" />
 
     <!-- Vendors CSS -->
-    <link rel="stylesheet" href="{%static 'assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css'%}" />
+    <link
+      rel="stylesheet" href="{%static 'assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css'%}"/>
 
     <!-- Page CSS -->
 
@@ -64,16 +72,18 @@
     <script src="{%static 'assets/js/config.js'%}"></script>
     <script>
       function mostrarSelect() {
-        var radioSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
-        var selectEfectivo = document.getElementById('efectivoSel');
-        var selectTarjeta = document.getElementById('tarjetaSel');
+        var radioSeleccionado = document.querySelector(
+          'input[name="metodoPago"]:checked'
+        );
+        var selectEfectivo = document.getElementById("efectivoSel");
+        var selectTarjeta = document.getElementById("tarjetaSel");
 
-        if (radioSeleccionado && radioSeleccionado.value === 'MP-EFEC') {
-          selectEfectivo.style.display = 'block';  // Mostrar el select
-          selectTarjeta.style.display = 'none';  // Mostrar el select
-        } else if (radioSeleccionado && radioSeleccionado.value === 'MP-TARJ') {
-          selectEfectivo.style.display = 'none';  // Mostrar el select
-          selectTarjeta.style.display = 'block';  // Mostrar el select
+        if (radioSeleccionado && radioSeleccionado.value === "MP-EFEC") {
+          selectEfectivo.style.display = "block"; // Mostrar el select
+          selectTarjeta.style.display = "none"; // Mostrar el select
+        } else if (radioSeleccionado && radioSeleccionado.value === "MP-TARJ") {
+          selectEfectivo.style.display = "none"; // Mostrar el select
+          selectTarjeta.style.display = "block"; // Mostrar el select
         }
       }
     </script>
@@ -85,16 +95,27 @@
       <div class="layout-container">
         <!-- Menu -->
 
-        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+        <aside
+          id="layout-menu"
+          class="layout-menu menu-vertical menu bg-menu-theme"
+        >
           <div class="app-brand demo">
             <a href="{% url 'index'%}" class="app-brand-link">
               <span class="app-brand-logo demo">
-                <img height='64px' src="{% static 'assets/img/favicon/FinanzApp.png' %}">
+                <img
+                  height="64px"
+                  src="{% static 'assets/img/favicon/FinanzApp.png' %}"
+                />
               </span>
-              <span class="app-brand-text demo menu-text fw-bolder ms-2">FinanzApp</span>
+              <span class="app-brand-text demo menu-text fw-bolder ms-2"
+                >FinanzApp</span
+              >
             </a>
 
-            <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+            <a
+              href="javascript:void(0);"
+              class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none"
+            >
               <i class="bx bx-chevron-left bx-sm align-middle"></i>
             </a>
           </div>
@@ -113,7 +134,7 @@
             <!---->
             <li class="menu-item">
               <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class='menu-icon bx bxs-dashboard'></i>
+                <i class="menu-icon bx bxs-dashboard"></i>
                 <div data-i18n="Layouts">Encuesta de satisfacción</div>
               </a>
               <ul class="menu-sub">
@@ -134,11 +155,11 @@
             <!-- Layouts -->
             <li class="menu-item active open">
               <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class='menu-icon bx bx-stats'></i>
+                <i class="menu-icon bx bx-stats"></i>
                 <div data-i18n="Layouts">Control financiero</div>
               </a>
 
-              <ul class="menu-sub ">
+              <ul class="menu-sub">
                 <li class="menu-item">
                   <a href="{% url 'movimientos'%}" class="menu-link">
                     <div data-i18n="Without menu">Movimientos</div>
@@ -174,7 +195,7 @@
 
             <li class="menu-item">
               <a href="{% url 'conversor'%}" class="menu-link">
-                <i class='menu-icon tf-icons bx bxs-bank'></i>
+                <i class="menu-icon tf-icons bx bxs-bank"></i>
                 <div data-i18n="Analytics">Conversión de divisas</div>
               </a>
             </li>
@@ -184,8 +205,10 @@
             </li>
             <li class="menu-item">
               <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class='menu-icon bx bxs-user-account'></i>
-                <div data-i18n="Account Settings">Configuraciones de la cuenta</div>
+                <i class="menu-icon bx bxs-user-account"></i>
+                <div data-i18n="Account Settings">
+                  Configuraciones de la cuenta
+                </div>
               </a>
               <ul class="menu-sub">
                 <li class="menu-item">
@@ -207,13 +230,13 @@
             </li>
             <li class="menu-item">
               <a href="{% url 'tarjetas'%}" class="menu-link">
-                <i class='menu-icon bx bxs-credit-card'></i>
+                <i class="menu-icon bx bxs-credit-card"></i>
                 <div data-i18n="Tarjetas">Gestión de tarjetas</div>
               </a>
             </li>
             <li class="menu-item">
               <a href="{% url 'logout'%}" class="menu-link">
-                <i class='menu-icon bx bx-log-out'></i>
+                <i class="menu-icon bx bx-log-out"></i>
                 <div data-i18n="sesion">Cerrar sesión</div>
               </a>
             </li>
@@ -229,13 +252,21 @@
             class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
             id="layout-navbar"
           >
-            <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-              <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+            <div
+              class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none"
+            >
+              <a
+                class="nav-item nav-link px-0 me-xl-4"
+                href="javascript:void(0)"
+              >
                 <i class="bx bx-menu bx-sm"></i>
               </a>
             </div>
 
-            <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+            <div
+              class="navbar-nav-right d-flex align-items-center"
+              id="navbar-collapse"
+            >
               <!-- Search -->
               <div class="navbar-nav align-items-center">
                 <div class="nav-item d-flex align-items-center">
@@ -266,9 +297,17 @@
 
                 <!-- User -->
                 <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                  <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                  <a
+                    class="nav-link dropdown-toggle hide-arrow"
+                    href="javascript:void(0);"
+                    data-bs-toggle="dropdown"
+                  >
                     <div class="avatar avatar-online">
-                      <img src="{% static 'assets/img/avatars/1.png'%}" alt class="w-px-40 h-auto rounded-circle" />
+                      <img
+                        src="{% static 'assets/img/avatars/1.png'%}"
+                        alt
+                        class="w-px-40 h-auto rounded-circle"
+                      />
                     </div>
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end">
@@ -277,7 +316,11 @@
                         <div class="d-flex">
                           <div class="flex-shrink-0 me-3">
                             <div class="avatar avatar-online">
-                              <img src="{% static 'assets/img/avatars/1.png'%}" alt class="w-px-40 h-auto rounded-circle" />
+                              <img
+                                src="{% static 'assets/img/avatars/1.png'%}"
+                                alt
+                                class="w-px-40 h-auto rounded-circle"
+                              />
                             </div>
                           </div>
                           <div class="flex-grow-1">
@@ -307,7 +350,10 @@
                         <span class="d-flex align-items-center align-middle">
                           <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
                           <span class="flex-grow-1 align-middle">Billing</span>
-                          <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
+                          <span
+                            class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20"
+                            >4</span
+                          >
                         </span>
                       </a>
                     </li>
@@ -335,28 +381,49 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
               <h4 class="fw-bold py-3 mb-4">
-                <span class="text-muted fw-light">Control financiero / </span> Gastos
+                <span class="text-muted fw-light">Control financiero / </span>
+                Gastos
               </h4>
 
               <!-- Hoverable Table rows -->
               <div class="card">
-                
                 <div class="card-body demo-vertical-spacing demo-only-element">
-                  {% comment %} FORMULARIO PARA BUSCAR MOVIMIENTOS ENTRE FECHAS {% endcomment %}
+                  {% comment %} FORMULARIO PARA BUSCAR MOVIMIENTOS ENTRE FECHAS
+                  {% endcomment %}
                   <div class="col-xl">
                     <div class="card mb-4">
-                      <div class="card-header d-flex justify-content-between align-items-center">
+                      <div
+                        class="card-header d-flex justify-content-between align-items-center"
+                      >
                         <h5 class="mb-0">Registro de gastos</h5>
                       </div>
-                      <div class="alert alert-danger alert-dismissible" id="alerta"
-                        role="alert" style="display: {{ mostrarError }};">
+                      <div
+                        class="alert alert-danger alert-dismissible"
+                        id="alerta"
+                        role="alert"
+                        style="display: {{ mostrarError }};"
+                      >
                         {{ error }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="alert"
+                          aria-label="Close"
+                        ></button>
                       </div>
-                        <div id="mensaje" class="alert alert-success alert-dismissible"
-                          role="alert" style="display: {{ mostrarMensaje }};">
+                      <div
+                        id="mensaje"
+                        class="alert alert-success alert-dismissible"
+                        role="alert"
+                        style="display: {{ mostrarMensaje }};"
+                      >
                         {{ mensaje }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="alert"
+                          aria-label="Close"
+                        ></button>
                       </div>
                       <div class="card-body">
                         <form class="mb-3" action="/gastos/" method="POST">
@@ -364,11 +431,13 @@
                           <div class="mb-3">
                             <label class="form-label" for="fecha">Fecha:</label>
                             <div class="form-control">
-                              <input class="form-control"
+                              <input
+                                class="form-control"
                                 type="date"
                                 name="fecha"
                                 id="fecha"
-                                required />
+                                required
+                              />
                             </div>
                           </div>
                           <div class="mb-3">
@@ -388,38 +457,61 @@
                             </div>
                           </div>
                           <div class="mb-3">
-                            <label class="form-label" for="moneda">Moneda:</label>
+                            <label class="form-label" for="moneda"
+                              >Moneda:</label
+                            >
                             <div class="input-group input-group-merge">
-                              <span class="input-group-text"><i class='bx bx-category'></i></span>
-                              <select class="form-select"
+                              <span class="input-group-text"
+                                ><i class="bx bx-category"></i
+                              ></span>
+                              <select
+                                class="form-select"
                                 id="moneda"
                                 name="moneda"
                                 aria-label="Selecciona el tipo de moneda"
-                                required>
-                                <option selected value="">Selecciona el tipo de moneda</option>
+                                required
+                              >
+                                <option selected value="">
+                                  Selecciona el tipo de moneda
+                                </option>
                                 {% for moneda in monedas %}
-                                    <option value="{{ moneda.id_moneda }}">{{ moneda.nombre_moneda }}</option>
+                                <option value="{{ moneda.id_moneda }}">
+                                  {{ moneda.nombre_moneda }}
+                                </option>
                                 {% endfor %}
                               </select>
                             </div>
                           </div>
                           {% comment %} CATEGORÍA DE INGRESOS {% endcomment %}
                           <div class="mb-3">
-                            <label class="form-label" for="categoria">Categoría</label>
+                            <label class="form-label" for="categoria"
+                              >Categoría</label
+                            >
                             <div class="input-group input-group-merge">
-                              <span class="input-group-text"><i class='bx bx-category'></i></span>
-                              <select class="form-select"
+                              <span class="input-group-text"
+                                ><i class="bx bx-category"></i
+                              ></span>
+                              <select
+                                class="form-select"
                                 id="categoria"
                                 name="categoria"
                                 aria-label="Selecciona una categoría"
-                                required>
-                                <option selected value="">Selecciona una categoría</option>
+                                required
+                              >
+                                <option selected value="">
+                                  Selecciona una categoría
+                                </option>
                                 {% for categoria in categorias %}
-                                  <option value="{{ categoria.id_categoria}}">{{ categoria.nombre}}</option>
+                                <option value="{{ categoria.id_categoria}}">
+                                  {{ categoria.nombre}}
+                                </option>
                                 {% endfor %}
                               </select>
                             </div>
-                            <div class="form-text">Selecciona una categoría correspondiente al ingreso.</div>
+                            <div class="form-text">
+                              Selecciona una categoría correspondiente al
+                              ingreso.
+                            </div>
                           </div>
                           {% comment %} SELECCIÓN DE MÉTODO {% endcomment %}
                           <div class="mb-3">
@@ -436,14 +528,20 @@
                                 checked
                                 required
                               />
-                              <label class="form-check-label" for="efectivo"> Efectivo </label>
-                              <select class="form-select"
+                              <label class="form-check-label" for="efectivo">
+                                Efectivo
+                              </label>
+                              <select
+                                class="form-select"
                                 id="efectivoSel"
                                 name="efectivoSel"
                                 required
-                                style="display: block;">
+                                style="display: block"
+                              >
                                 {% for cartera in carteras %}
-                                  <option value="{{ cartera.id_cuenta}}">{{ cartera.nombre_cuenta }}</option>
+                                <option value="{{ cartera.id_cuenta}}">
+                                  {{ cartera.nombre_cuenta }}
+                                </option>
                                 {% endfor %}
                               </select>
                             </div>
@@ -458,22 +556,34 @@
                                 onchange="mostrarSelect()"
                                 required
                               />
-                              <label class="form-check-label" for="tarjeta"> Tarjeta </label>
-                              <select class="form-select"
+                              <label class="form-check-label" for="tarjeta">
+                                Tarjeta
+                              </label>
+                              <select
+                                class="form-select"
                                 id="tarjetaSel"
                                 name="tarjetaSel"
-                                style="display: none;"
-                                required>
+                                style="display: none"
+                                required
+                              >
                                 {% for tarjeta in tarjetas %}
-                                  <option value="{{ tarjeta.id_cuenta }}">{{ tarjeta.nombre_cuenta }}</option>
+                                <option value="{{ tarjeta.id_cuenta }}">
+                                  {{ tarjeta.nombre_cuenta }}
+                                </option>
                                 {% endfor %}
                               </select>
                             </div>
                           </div>
                           <div class="mb-3">
-                            <label class="form-label" for="basic-icon-default-message">Nota</label>
+                            <label
+                              class="form-label"
+                              for="basic-icon-default-message"
+                              >Nota</label
+                            >
                             <div class="input-group input-group-merge">
-                              <span id="basic-icon-default-message2" class="input-group-text"
+                              <span
+                                id="basic-icon-default-message2"
+                                class="input-group-text"
                                 ><i class="bx bx-comment"></i
                               ></span>
                               <textarea
@@ -487,74 +597,80 @@
                               ></textarea>
                             </div>
                           </div>
-                          <button type="submit" class="btn btn-info form-control">Registrar </button>
+                          <button
+                            type="submit"
+                            class="btn btn-info form-control"
+                          >
+                            Registrar
+                          </button>
                         </form>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div><hr>
+              </div>
+
+              <hr />
+
+              <!-- Hoverable Table rows -->
               <div class="card">
-                <!-- Expense Overview -->
-                <div>
-                  <div>
-                    <div class="card-header">
-                      <ul class="nav nav-pills" role="tablist">
-                        <li class="nav-item">
-                          <button
-                            type="button"
-                            class="nav-link active"
-                            role="tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#navs-tabs-line-card-income"
-                            aria-controls="navs-tabs-line-card-income"
-                            aria-selected="true"
-                          >
-                            Income
-                          </button>
-                        </li>
-                        <li class="nav-item">
-                          <button type="button" class="nav-link" role="tab">Expenses</button>
-                        </li>
-                        <li class="nav-item">
-                          <button type="button" class="nav-link" role="tab">Profit</button>
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="card-body px-0">
-                      <div class="tab-content p-0">
-                        <div class="tab-pane fade show active" id="navs-tabs-line-card-income" role="tabpanel">
-                          <div class="d-flex p-4 pt-3">
-                            <div class="avatar flex-shrink-0 me-3">
-                              <img src="{% static 'assets/img/icons/unicons/wallet.png'%}" alt="User" />
-                            </div>
-                            <div>
-                              <small class="text-muted d-block">Total Balance</small>
-                              <div class="d-flex align-items-center">
-                                <h6 class="mb-0 me-1">$459.10</h6>
-                                <small class="text-success fw-semibold">
-                                  <i class="bx bx-chevron-up"></i>
-                                  42.9%
-                                </small>
-                              </div>
-                            </div>
-                          </div>
-                          <div id="incomeChart"></div>
-                          <div class="d-flex justify-content-center pt-4 gap-2">
-                            <div class="flex-shrink-0">
-                              <div id="expensesOfWeek"></div>
-                            </div>
-                            <div>
-                              <p class="mb-n1 mt-1">Expenses This Week</p>
-                              <small class="text-muted">$39 less than last week</small>
+                <h5 class="card-header">Gastos registrados</h5>
+                <div class="card-body table-responsive">
+                  <table class="table table-hover" id="datatablesSimple">
+                    <thead>
+                      <tr>
+                        <th style="display: none">ID</th>
+                        <th>Concepto</th>
+                        <th>Fecha</th>
+                        <th>Cantidad</th>
+                        <th>Tipo de operación</th>
+                        <th>Método de pago</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                      {% for ingreso in ingresos %}
+                      <tr>
+                        <td style="display: none">
+                          {{ ingreso.id_transaccion }}
+                        </td>
+                        <td>{{ ingreso.descripcion }}</td>
+                        <td>{{ ingreso.fecha }}</td>
+                        <td>
+                          {{ ingreso.fk_moneda.simbolo_moneda }}{{ ingreso.monto}} {{ ingreso.fk_moneda.id_moneda }}
+                        </td>
+                        <td>{{ ingreso.fk_tipo.tipo_transaccion }}</td>
+                        <td>{{ ingreso.fk_cuenta.nombre_cuenta }}</td>
+                        <td>
+                          <div class="dropdown">
+                            <button
+                              type="button"
+                              class="btn p-0 dropdown-toggle hide-arrow"
+                              data-bs-toggle="dropdown"
+                            >
+                              <i class="bx bx-dots-vertical-rounded"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                              <a
+                                class="dropdown-item editar-btn"
+                                data-id="{{ ingreso.id_transaccion }}"
+                              >
+                                <i class="bx bx-edit-alt me-1"></i>Editar
+                              </a>
+                              <a
+                                class="dropdown-item eliminar-btn"
+                                data-id="{{ ingreso.id_transaccion }}"
+                              >
+                                <i class="bx bx-trash me-1"></i>Eliminar
+                              </a>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
                 </div>
-                <!--/ Expense Overview -->
               </div>
               <!--/ Hoverable Table rows -->
             </div>
@@ -562,9 +678,9 @@
 
             <!-- Footer -->
             <footer class="content-footer footer bg-footer-theme">
-              <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
-                
-              </div>
+              <div
+                class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column"
+              ></div>
             </footer>
             <!-- / Footer -->
 
@@ -580,6 +696,9 @@
     </div>
     <!-- / Layout wrapper -->
 
+    <!-- DATATABLES -->
+    <script src="{% static 'js/datatables.js'%}"></script>
+    <script src="{% static 'js/datatables-simple-demo.js'%}"></script>
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
@@ -602,5 +721,36 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <!-- JQUERY -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- OBTENCIÓN DE DATOS PARA ELIMINACIÓN -->
+    <script>
+      $(document).ready(function () {
+        $(".eliminar-btn").click(function () {
+          // Guarda una referencia a $(this) en una variable antes de la llamada AJAX
+          var that = $(this);
+          var id = that.data("id");
+          if (confirm("¿Estás seguro de que deseas eliminar este registro?")) {
+            $.ajax({
+              type: "POST",
+              url: "/eliminarTransaccion/", // Ajusta la URL de tu vista de eliminación
+              data: { id: id, csrfmiddlewaretoken: "{{ csrf_token }}" },
+              success: function (data) {
+                console.log(data);
+                // Obtén la fila DataTable asociada
+                // Elimina la fila directamente del DOM
+                $(that).closest("tr").remove();
+              },
+              error: function () {
+                alert("No fue posible eliminar este registro");
+              },
+            });
+          }
+        });
+      });
+    </script>
+    <!-- OBTENCIÓN DE DATOS PARA ELIMINACIÓN -->
   </body>
 </html>

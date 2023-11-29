@@ -26,6 +26,9 @@ class Categoria(models.Model):
         db_table='Categoria'
       
 class Tarjeta(models.Model):
+    def __str__(self):
+        return self.nombre_cuenta
+    
     id_cuenta = models.CharField(primary_key=True, max_length=24, db_column='id_cuenta')
     fk_usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1, db_column='fk_usuario')
     nombre_cuenta = models.CharField(max_length=100, db_column='nombre_cuenta')

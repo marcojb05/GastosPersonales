@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-# from google.oauth2 import service_account
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -90,13 +89,23 @@ WSGI_APPLICATION = 'APITESCHI.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'finanzapp',
+#         'USER': 'marco',
+#         'PASSWORD': 'akldXLFXEulZUMxtvB7KXdRk1yVh3zNv',
+#         'HOST': 'oregon-postgres.render.com',
+#         'PORT': '5432'
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'finanzapp',
-        'USER': 'marco',
-        'PASSWORD': 'akldXLFXEulZUMxtvB7KXdRk1yVh3zNv',
-        'HOST': 'oregon-postgres.render.com',
+        'USER': 'postgres',
+        'PASSWORD': 'Cc.-12345',
+        'HOST': 'localhost',
         'PORT': '5432'
     }
 }
@@ -136,19 +145,24 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'
+# Configuración para el almacenamiento estático
+STATIC_URL = 'https://storage.googleapis.com/finanzapp/static/'
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+GS_BUCKET_NAME = 'finanzapp'
+
+#STATIC_URL = '/static/'
 
 # Following settings only make sense on production and may break development environments.
-if not DEBUG:
+#if not DEBUG:
     # Tell Django to copy statics to the `staticfiles` directory
     # in your application directory on Render.
-    STATIC_ROOT = BASE_DIR / 'api/static'
+#    STATIC_ROOT = BASE_DIR / 'api/static'
 
     # Turn on WhiteNoise storage backend that takes care of compressing static files
     # and creating unique names for each version so they can safely be cached forever.
     #STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-LOGIN_URL = '/login/'
+# LOGIN_URL = '/login/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

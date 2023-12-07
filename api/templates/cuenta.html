@@ -338,35 +338,55 @@
                       >
                     </li>
                   </ul>
+                  <!-- DATOS BÁSICOS -->
                   <div class="card mb-4">
                     <h5 class="card-header">Detalles del perfil</h5>
                     <!-- Account -->
                     <div class="card-body">
                       <div class="d-flex align-items-start align-items-sm-center gap-4">
                         <div class="button-wrapper">
-                          <h3 class="text-muted mb-0">Nombre (usuario)</h3>
+                          <h3 class="text-muted mb-0">{{ nombre }} {{ apellidos }} ({{ user }})</h3>
                         </div>
                       </div>
                     </div>
                     <hr class="my-0" />
                     <div class="card-body">
-                      <form id="formAccountSettings" method="POST" onsubmit="return false">
+                      <div class="alert alert-danger alert-dismissible" id="alerta"
+                        role="alert" style="display: {{ mostrarError }};">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                        <div id="mensaje" class="alert alert-success alert-dismissible"
+                          role="alert" style="display: {{ mostrarMensaje }};">
+                        {{ mensaje }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                      <form id="formularioConfigCuenta" action="/cuenta/" method="POST">
+                        {% csrf_token %}
                         <div class="row">
                           <div class="mb-3 col-md-6">
-                            <label for="firstName" class="form-label">Nombre</label>
+                            <label for="nombre" class="form-label">Nombre</label>
                             <input
                               class="form-control"
                               type="text"
-                              id="firstName"
-                              name="firstName"
-                              value="John"
+                              id="nombre"
+                              name="nombre"
+                              value="{{ nombre }}"
+                              required
                               autofocus
                             />
                           </div>
                           <div class="mb-3 col-md-6">
-                            <label for="lastName" class="form-label">Apellido</label>
-                            <input class="form-control" type="text" name="lastName" id="lastName" value="Doe" />
+                            <label for="apellidos" class="form-label">Apellidos</label>
+                            <input class="form-control"
+                              type="text"
+                              name="apellidos"
+                              id="apellidos"
+                              value="{{ apellidos}}"
+                              required
+                            />
                           </div>
+                          
                           <div class="mb-3 col-md-6">
                             <label for="email" class="form-label">E-mail</label>
                             <input
@@ -374,124 +394,18 @@
                               type="text"
                               id="email"
                               name="email"
-                              value="john.doe@example.com"
-                              placeholder="john.doe@example.com"
+                              value="{{ email }}"
+                              placeholder="usuario@correo.com"
+                              required
                             />
                           </div>
                           <div class="mb-3 col-md-6">
-                            <label for="organization" class="form-label">Organización</label>
-                            <input
-                              type="text"
-                              class="form-control"
-                              id="organization"
-                              name="organization"
-                              value="ThemeSelection"
-                            />
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label class="form-label" for="phoneNumber">Número de teléfono</label>
-                            <div class="input-group input-group-merge">
-                              <span class="input-group-text">US (+1)</span>
-                              <input
-                                type="text"
-                                id="phoneNumber"
-                                name="phoneNumber"
-                                class="form-control"
-                                placeholder="202 555 0111"
-                              />
-                            </div>
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label for="address" class="form-label">Dirección</label>
-                            <input type="text" class="form-control" id="address" name="address" placeholder="Address" />
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label for="state" class="form-label">Estado</label>
-                            <input class="form-control" type="text" id="state" name="state" placeholder="California" />
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label for="zipCode" class="form-label">Código postal</label>
-                            <input
-                              type="text"
-                              class="form-control"
-                              id="zipCode"
-                              name="zipCode"
-                              placeholder="231465"
-                              maxlength="6"
-                            />
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label class="form-label" for="country">País</label>
-                            <select id="country" class="select2 form-select">
-                              <option value="">Select</option>
-                              <option value="Australia">Australia</option>
-                              <option value="Bangladesh">Bangladesh</option>
-                              <option value="Belarus">Belarus</option>
-                              <option value="Brazil">Brazil</option>
-                              <option value="Canada">Canada</option>
-                              <option value="China">China</option>
-                              <option value="France">France</option>
-                              <option value="Germany">Germany</option>
-                              <option value="India">India</option>
-                              <option value="Indonesia">Indonesia</option>
-                              <option value="Israel">Israel</option>
-                              <option value="Italy">Italy</option>
-                              <option value="Japan">Japan</option>
-                              <option value="Korea">Korea, Republic of</option>
-                              <option value="Mexico">Mexico</option>
-                              <option value="Philippines">Philippines</option>
-                              <option value="Russia">Russian Federation</option>
-                              <option value="South Africa">South Africa</option>
-                              <option value="Thailand">Thailand</option>
-                              <option value="Turkey">Turkey</option>
-                              <option value="Ukraine">Ukraine</option>
-                              <option value="United Arab Emirates">United Arab Emirates</option>
-                              <option value="United Kingdom">United Kingdom</option>
-                              <option value="United States">United States</option>
-                            </select>
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label for="language" class="form-label">Idioma</label>
-                            <select id="language" class="select2 form-select">
-                              <option value="">Select Language</option>
-                              <option value="en">English</option>
-                              <option value="fr">French</option>
-                              <option value="de">German</option>
-                              <option value="pt">Portuguese</option>
-                            </select>
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label for="timeZones" class="form-label">Zona horaria</label>
-                            <select id="timeZones" class="select2 form-select">
-                              <option value="">Select Timezone</option>
-                              <option value="-12">(GMT-12:00) International Date Line West</option>
-                              <option value="-11">(GMT-11:00) Midway Island, Samoa</option>
-                              <option value="-10">(GMT-10:00) Hawaii</option>
-                              <option value="-9">(GMT-09:00) Alaska</option>
-                              <option value="-8">(GMT-08:00) Pacific Time (US & Canada)</option>
-                              <option value="-8">(GMT-08:00) Tijuana, Baja California</option>
-                              <option value="-7">(GMT-07:00) Arizona</option>
-                              <option value="-7">(GMT-07:00) Chihuahua, La Paz, Mazatlan</option>
-                              <option value="-7">(GMT-07:00) Mountain Time (US & Canada)</option>
-                              <option value="-6">(GMT-06:00) Central America</option>
-                              <option value="-6">(GMT-06:00) Central Time (US & Canada)</option>
-                              <option value="-6">(GMT-06:00) Guadalajara, Mexico City, Monterrey</option>
-                              <option value="-6">(GMT-06:00) Saskatchewan</option>
-                              <option value="-5">(GMT-05:00) Bogota, Lima, Quito, Rio Branco</option>
-                              <option value="-5">(GMT-05:00) Eastern Time (US & Canada)</option>
-                              <option value="-5">(GMT-05:00) Indiana (East)</option>
-                              <option value="-4">(GMT-04:00) Atlantic Time (Canada)</option>
-                              <option value="-4">(GMT-04:00) Caracas, La Paz</option>
-                            </select>
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label for="currency" class="form-label">Moneda</label>
-                            <select id="currency" class="select2 form-select">
-                              <option value="">Select Currency</option>
-                              <option value="usd">USD</option>
-                              <option value="euro">Euro</option>
-                              <option value="pound">Pound</option>
-                              <option value="bitcoin">Bitcoin</option>
+                            <label for="moneda" class="form-label">Moneda</label>
+                            <select id="moneda" name="moneda" class="select2 form-select" required>
+                              <option value="">Seleccione una divisa</option>
+                                {% for moneda in monedas %}
+                                    <option value="{{ moneda.id_moneda }}">{{ moneda.id_moneda }} - {{ moneda.nombre_moneda }}</option>
+                                {% endfor %}
                             </select>
                           </div>
                         </div>
@@ -503,13 +417,79 @@
                     </div>
                     <!-- /Account -->
                   </div>
-                  <div class="card">
-                    <h5 class="card-header">Delete Account</h5>
+                  <hr>
+                  <div class="card mb-4">
+                    <h5 class="card-header">Cambiar contraseña</h5>
+                    <div class="card-body">
+                      <div class="alert alert-danger alert-dismissible" id="alerta"
+                        role="alert" style="display: {{ mostrarError }};">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                        <div id="mensaje" class="alert alert-success alert-dismissible"
+                          role="alert" style="display: {{ mostrarMensaje }};">
+                        {{ mensaje }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                      
+                      <form id="formularioConfigCuenta" action="/cuenta/" method="POST">
+                        {% csrf_token %}
+                        <div class="row">
+                          <div class="mb-3 col-md-6">
+                            <label for="nombre" class="form-label">Nueva contarseña</label>
+                            <input
+                              class="form-control"
+                              type="password"
+                              id="contrasena"
+                              name="contrasena"
+                              placeholder="********"
+                            />
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="apellido" class="form-label">Confirme la nueva contraseña</label>
+                            <input class="form-control"
+                              type="password"
+                              name="confContrasena"
+                              id="confContrasena"
+                              placeholder="********"
+                            />
+                          </div>
+                          
+                          <div class="mb-3 col-md-6">
+                            <label for="email" class="form-label">Ingrese su contraseña actual</label>
+                            <input
+                              class="form-control"
+                              type="password"
+                              id="email"
+                              name="email"
+                              placeholder="********"
+                            />
+                          </div>
+                        <div class="mt-2">
+                          <button type="submit" class="btn btn-primary me-2">Cambiar contraseña</button>
+                          <button type="reset" class="btn btn-outline-secondary">Cancelar</button>
+                        </div>
+                        <div class="mb-3 form-password-toggle">
+                          <div class="d-flex justify-content-between">
+                            <a href="{% url 'reestablecer'%}">
+                              <small>¿Olvidaste tu contraseña?</small>
+                            </a>
+                          </div>
+                        <div>
+                      </form>
+                    </div>
+                    <!-- /Account -->
+                  </div>
+                  <hr>
+
+                  <!-- ELIMINAR CUENTA -->
+                  <div class="card mb-4">
+                    <h5 class="card-header">Eliminar Cuenta</h5>
                     <div class="card-body">
                       <div class="mb-3 col-12 mb-0">
                         <div class="alert alert-warning">
                           <h6 class="alert-heading fw-bold mb-1">¿Seguro que quieres eliminar tu cuenta?</h6>
-                          <p class="mb-0">Una vez que elimine su cuenta, no hay vuelta atrás. Por favor, esté seguro.</p>
+                          <p class="mb-0">Una vez que elimine su cuenta, no hay vuelta atrás. ¿Confirma la eliminación de su cuenta?.</p>
                         </div>
                       </div>
                       <form id="formAccountDeactivation" onsubmit="return false">

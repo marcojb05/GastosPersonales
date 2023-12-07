@@ -119,10 +119,52 @@ class Cuenta (APIView):
     template_name = "cuenta.html"
 
     def get(self, request):
-        return render(request, self.template_name)
+        context = self.get_context_data('none', '', 'none', '')
+        return render(request, self.template_name, context)
 
     def post(self, request):
-        return render(request, self.template_name)
+        usuario = self.request.user
+        usuarioId = usuario.id
+        
+        try:
+            user = User.objects.get(id=usuarioId)
+            user.first_name = request.POST['nombre']
+            user.last_name = request.POST['apellidos']
+            user.email = request.POST['email']
+            user.save()
+            
+            context = self.get_context_data('none', '', 'block', 'Los datos se actualizaron correctamente.')
+            return render(request, self.template_name, context)
+        except IntegrityError as e:
+            context = self.get_context_data('block', 'Este correo ya ha sido usado por otro usuario', 'none', '')
+            return render(request, self.template_name, context)
+        except:
+            context = self.get_context_data('block', 'No es posible actualizar los campos', 'none', '')
+            return render(request, self.template_name, context)
+            
+    def get_context_data(self, mensajeError, error, mostrarMensaje, mensaje):
+         # Obtiene el usuairo y su ID
+        usuario = self.request.user
+        usuario_id = usuario.id
+        user=usuario.get_username
+        email=usuario.email
+        nombre = usuario.first_name
+        apellidos = usuario.last_name
+        
+        # Consulta las monedas registradas en la BD
+        monedas = Moneda.objects.all()
+        
+        return {
+            'monedas': monedas,
+            'user': user,
+            'nombre': nombre,
+            'apellidos': apellidos,
+            'email': email,
+            'mostrarError': mensajeError,
+            'error': error,
+            'mostrarMensaje': mostrarMensaje,
+            'mensaje': mensaje,
+        }
 
 
 @method_decorator(login_required, name='dispatch')

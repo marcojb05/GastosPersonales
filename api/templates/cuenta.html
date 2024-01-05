@@ -417,7 +417,9 @@
                     </div>
                     <!-- /Account -->
                   </div>
+                  <!-- /DATOS BÁSICOS -->
                   <hr>
+                  <!-- CAMBIO DE CONTRASEÑA -->
                   <div class="card mb-4">
                     <h5 class="card-header">Cambiar contraseña</h5>
                     <div class="card-body">
@@ -431,7 +433,6 @@
                         {{ mensaje }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                       </div>
-                      
                       <form id="formularioConfigCuenta" action="/cuenta/" method="POST">
                         {% csrf_token %}
                         <div class="row">
@@ -465,27 +466,37 @@
                               placeholder="********"
                             />
                           </div>
+                        </div>
                         <div class="mt-2">
                           <button type="submit" class="btn btn-primary me-2">Cambiar contraseña</button>
                           <button type="reset" class="btn btn-outline-secondary">Cancelar</button>
                         </div>
-                        <div class="mb-3 form-password-toggle">
                           <div class="d-flex justify-content-between">
                             <a href="{% url 'reestablecer'%}">
                               <small>¿Olvidaste tu contraseña?</small>
                             </a>
                           </div>
-                        <div>
                       </form>
                     </div>
                     <!-- /Account -->
                   </div>
+                  <!-- /CAMBIO DE CONTRASEÑA -->
                   <hr>
-
                   <!-- ELIMINAR CUENTA -->
                   <div class="card mb-4">
                     <h5 class="card-header">Eliminar Cuenta</h5>
                     <div class="card-body">
+                      <div class="alert alert-danger alert-dismissible" id="alerta"
+                        role="alert" style="display: {{ mostrarError }};">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                        <div id="mensaje" class="alert alert-success alert-dismissible"
+                          role="alert" style="display: {{ mostrarMensaje }};">
+                        {{ mensaje }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                      
                       <div class="mb-3 col-12 mb-0">
                         <div class="alert alert-warning">
                           <h6 class="alert-heading fw-bold mb-1">¿Seguro que quieres eliminar tu cuenta?</h6>
@@ -499,17 +510,58 @@
                             type="checkbox"
                             name="accountActivation"
                             id="accountActivation"
+                            onchange="toggleDeactivateButton()"
                           />
-                          <label class="form-check-label" for="accountActivation"
-                            >Confirmo la desactivación de mi cuenta</label
-                          >
+                          <label class="form-check-label" for="accountActivation">
+                            Confirmo la desactivación de mi cuenta
+                          </label>
                         </div>
-                        <button type="submit" class="btn btn-danger deactivate-account">Desactivar cuenta</button>
+                        <button type="submit" class="btn btn-danger deactivate-account" id="deactivateButton" disabled>
+                          Desactivar cuenta
+                        </button>
                       </form>
+
+                    </div>
+                    <!-- /Account -->
+                  </div>
+                  <!-- /ELIMINAR CUENTA -->
+                </div>
+              </div>
+
+              <!-- MODAL PARA ELIMINACIÓN DE LA CUENTA -->
+              <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Editar Pago</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <!-- Aquí coloca los campos de edición -->
+                      <form id="formularioEdicion">
+                        <!-- Campos de edición -->
+                        <div class="row">
+                          <div class="mb-3 col-md-6">
+                            <label for="contrasena" class="form-label">Escriba su contraseña:</label>
+                            <input type="text" class="form-control" id="contrasena" name="contrasena">
+                            </div>
+                          </div>
+                          <div class="mb-3 col-md-6">
+                            <label for="contrasena" class="form-label">Escriba su contraseña:</label>
+                            <input type="text" class="form-control" id="contrasena" name="contrasena">
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" id="guardarCambios">Guardar cambios</button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+              <!-- /MODAL PARA ELIMINACIÓN DE LA CUENTA -->
             </div>
             <!-- / Content -->
 
@@ -550,6 +602,9 @@
 
     <!-- Page JS -->
     <script src="{% static 'assets/js/pages-account-settings-account.js'%}"></script>
+
+    <!-- JS -->
+    <script src="{% static 'js/deshabilitarCuenta.js'%}"></script>
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>

@@ -61,6 +61,14 @@ class Pago(models.Model):
     class Meta:
         db_table='Pago'
 
+# Modelo de monedas
+class Moneda(models.Model):
+    id_moneda = models.CharField(primary_key=True, max_length=3, db_column='id_moneda')
+    nombre_moneda = models.CharField(max_length=255)
+    simbolo_moneda = models.CharField(max_length=10)
+    class Meta:
+        db_table='Moneda'
+        
 # Modelo de metas financieras
 class MetaFinanciera(models.Model):
     id_meta = models.CharField(primary_key=True, max_length=20, db_column='id_meta')
@@ -69,16 +77,9 @@ class MetaFinanciera(models.Model):
     objetivo = models.DecimalField(max_digits=10, decimal_places=2)
     fechaInicio = models.DateField()
     fechaTermino = models.DateField()
+    fk_moneda = models.ForeignKey(Moneda, on_delete=models.CASCADE, default='MXN', db_column='fk_moneda')
     class Meta:
         db_table='MetaFinanciera'
-
-# Modelo de monedas
-class Moneda(models.Model):
-    id_moneda = models.CharField(primary_key=True, max_length=3, db_column='id_moneda')
-    nombre_moneda = models.CharField(max_length=255)
-    simbolo_moneda = models.CharField(max_length=10)
-    class Meta:
-        db_table='Moneda'
 
 # Modelo de transacciones
 class Transaccion(models.Model):

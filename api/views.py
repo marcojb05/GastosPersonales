@@ -1,6 +1,7 @@
 from datetime import datetime, date, timedelta, timezone
 from sqlite3 import IntegrityError
 from django.core.mail import send_mail
+from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 import requests
@@ -26,6 +27,7 @@ from .models import Moneda, Categoria, Tarjeta, MetodoPago, Transaccion, TipoTra
 from django.contrib.auth import login
 from django.conf import settings
 from django.http import JsonResponse
+from rest_framework.response import Response
 # Calendario
 from .calendar_setup import get_calendar_service
 from django.views.decorators.csrf import csrf_exempt
@@ -822,6 +824,7 @@ class Metas (APIView):
         else:
             # OBTTENER LOS DATOS POR POST
             objetivoF = request.POST['objetivo']
+            monedaF = request.POST['moneda']
             fechaInicioF = request.POST['fechaInicio']
             fechaTerminoF = request.POST['fechaTermino']
             notaF = request.POST['nota']
@@ -840,6 +843,7 @@ class Metas (APIView):
                                      fechaInicio=fechaInicioF,
                                      fechaTermino=fechaTerminoF,
                                      fk_usuario=User.objects.get(id = usuario_id),
+                                     fk_moneda=Moneda.objects.get(id_moneda=monedaF),
                                     )
                 nuevaMeta.save()
                 context = self.get_context_data('none', '', 'block', 'Los datos se han registrado correctamente.')
@@ -853,7 +857,20 @@ class Metas (APIView):
     
     # Realiza las consultas y renderiza en los campos
     def get_context_data(self, mensajeError, error, mostrarMensaje, mensaje):
+        # Obtiene el usuairo y su ID
+        usuario = self.request.user
+        usuario_id = usuario.id
+        
+        # Consulta las monedas registradas en la BD
+        monedas = Moneda.objects.all()
+        
+        # Consulta las eventos para las tablas
+        metas = MetaFinanciera.objects.filter(
+            fk_usuario=usuario_id
+        )
         return {
+            'monedas': monedas,
+            'metas': metas,
             'mostrarError': mensajeError,
             'error': error,
             'mostrarMensaje': mostrarMensaje,
@@ -863,10 +880,93 @@ class Metas (APIView):
     # Verifica que se envíen los datos requeridos por POST
     def verifica(self):
         if ('objetivo' not in self.request.POST or
+            'moneda' not in self.request.POST or
             'fechaInicio' not in self.request.POST or
             'fechaTermino' not in self.request.POST or
             'nota' not in self.request.POST
             ):
+            return False
+        else:
+            return True
+
+class actualizarMeta(APIView):
+    def get(self, request):
+        if request.method == "GET" and 'id_meta' in request.GET:
+            # Obtiene el usuario y su ID
+            usuario = request.user
+            usuario_id = usuario.id
+            
+            # Obtiene id_meta de la solicitud GET
+            id_meta = request.GET.get('id_meta')
+
+            # Consulta para obtener la instancia de MetaFinanciera del usuario
+            try:
+                meta = MetaFinanciera.objects.get(id_meta=id_meta, fk_usuario=usuario_id)
+                
+                # Serializa los datos de la instancia de MetaFinanciera
+                meta_data = serializers.serialize('json', [meta])
+
+                return JsonResponse({'meta': meta_data})
+            except MetaFinanciera.DoesNotExist:
+                return JsonResponse({"error": f"No se encontró ninguna MetaFinanciera con id_meta='{id_meta}' para el usuario actual"})
+            
+    def post(self, request):
+        if self.comprobarCampos():
+            
+            try:
+                idEditar = request.POST.get('idEditar')
+                objetivoEditar = request.POST.get('objetivoEditar')
+                monedaEditar = request.POST.get('monedaEditar')
+                fechaInicioEditar = request.POST.get('fechaInicioEditar')
+                fechaTerminoEditar = request.POST.get('fechaTerminoEditar')
+                notaEditar = request.POST.get('notaEditar')
+                
+                meta = get_object_or_404(MetaFinanciera, id_meta=idEditar)
+                meta.objetivo = objetivoEditar
+                meta.fk_moneda = Moneda.objects.get(id_moneda = monedaEditar)
+                meta.fechaInicio =fechaInicioEditar
+                meta.fechaTermino = fechaTerminoEditar
+                meta.descripcion = notaEditar
+                
+                meta.save()
+                
+                return Response({"message": "La edición se realizó con éxito"})
+            except IntegrityError as e:
+                return JsonResponse({"error": "Se encontró un registro dulicado"}, status=400)
+            except Exception as e:
+                return JsonResponse({"error": "No se pudo realizar la edición"}, status=400)
+            
+        else:
+            print("Todos los campos de edición son obligatorios")
+            return JsonResponse({'error': "Todos los campos de edición son obligatorios"}, status=400)
+        
+    def comprobarCampos(self):
+        if ('idEditar' not in self.request.POST or 'objetivoEditar' not in self.request.POST or
+            'monedaEditar' not in self.request.POST or 'fechaInicioEditar' not in self.request.POST or
+            'fechaTerminoEditar' not in self.request.POST or 'notaEditar' not in self.request.POST):
+            return False
+        else:
+            return True
+
+class eliminarMeta(APIView):
+    def post(self, request):
+        if 'id_meta' not in self.request.POST:
+            return JsonResponse({'error': "Ocurrió un error al reaizar esta operación"}, status=400)
+            
+        else:
+            try:
+                id_meta = request.POST.get('id_meta')
+                
+                meta = get_object_or_404(MetaFinanciera, id_meta=id_meta)
+                
+                meta.delete()
+                
+                return Response({"message": "La meta se eliminó con éxito."})
+            except Exception as e:
+                return JsonResponse({"error": "No fue posible eliminar eñ registro"}, status=400)
+        
+    def comprobarCampos(self):
+        if ('id_meta' not in self.request.POST):
             return False
         else:
             return True

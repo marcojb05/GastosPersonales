@@ -17,7 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import path
-from api.views import Home, signin, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, dashboard, Conversor, dashboard_powerbi
+from api.views import (Home, signin, Cuenta, Notificaciones, Conexiones, Movimientos, Ingresos, Gastos, Ahorros, DeudasPagos, Tarjetas, Metas, 
+                       dashboard, Conversor, dashboard_powerbi, actualizarMeta, eliminarMeta)
 from api import views
 from django.views.generic.base import RedirectView
 from django.conf.urls import handler404, handler500
@@ -58,4 +59,6 @@ urlpatterns = [
     path('eliminarEvento/', views.eliminarEvento, name='eliminarEvento'),
     path('actualizarEvento/', views.actualizarEvento, name='actualizarEvento'),
     path('eliminarTransaccion/', views.eliminarTransaccion, name='eliminarTransaccion'),
+    path('actualizarMeta/', actualizarMeta.as_view(), name='actualizarMeta'),
+    path('eliminarMeta/', eliminarMeta.as_view(), name='eliminarMeta'),
 ]

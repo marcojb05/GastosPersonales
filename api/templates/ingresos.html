@@ -66,22 +66,13 @@
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{%static 'assets/js/config.js'%}"></script>
     
-    {% comment %} MUESTRA UN SELECT AL SELECCIONAR UN RADIO {% endcomment %}
-    <script>
-      function mostrarSelect() {
-        var radioSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
-        var selectEfectivo = document.getElementById('efectivoSel');
-        var selectTarjeta = document.getElementById('tarjetaSel');
-
-        if (radioSeleccionado && radioSeleccionado.value === 'MP-EFEC') {
-          selectEfectivo.style.display = 'block';  // Mostrar el select
-          selectTarjeta.style.display = 'none';  // Mostrar el select
-        } else if (radioSeleccionado && radioSeleccionado.value === 'MP-TARJ') {
-          selectEfectivo.style.display = 'none';  // Mostrar el select
-          selectTarjeta.style.display = 'block';  // Mostrar el select
-        }
-      }
-    </script>
+    <!-- JS PARA MOSTRAR U OCULTAR SELECT SEGÚN EL RADIO SELECCIONADO -->
+    <script src="{% static 'js/mostrarMetodosPago.js'%}"></script>
+    <!-- JS PARA MOSTRAR U OCULTAR SELECT SEGÚN EL RADIO SELECCIONADO -->
+    
+    <!-- SWEETALERT2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SWEETALERT2 -->
   </head>
 
   <body>
@@ -347,7 +338,6 @@
               <div class="card">
                 
                 <div class="card-body demo-vertical-spacing demo-only-element">
-                  {% comment %} FORMULARIO PARA BUSCAR MOVIMIENTOS ENTRE FECHAS {% endcomment %}
                   <div class="col-xl">
                     <div class="card mb-4">
                       <div class="card-header d-flex justify-content-between align-items-center">
@@ -547,6 +537,160 @@
                 </div>
               </div>
               <!--/ Hoverable Table rows -->
+
+              <!-- Modal para la edición -->
+              <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Editar Pago</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <!-- Aquí coloca los campos de edición -->
+                      <form id="formularioEdicion">
+                        <!-- Campos de edición -->
+                          <input type="hidden" class="form-control" id="idEditar" name="idEditar" required>
+                        
+                          <div class="mb-3">
+                            <label class="form-label" for="fechaEditar">Fecha:</label>
+                            <div class="form-control">
+                              <input class="form-control"
+                                type="date"
+                                name="fechaEditar"
+                                id="fechaEditar"
+                                required />
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label" for="montoEditar">Monto</label>
+                            <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input
+                                type="number"
+                                min="0"
+                                class="form-control"
+                                placeholder="Monto"
+                                aria-label="Monto"
+                                id="montoEditar"
+                                name="montoEditar"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label" for="monedaEditar">Moneda:</label>
+                            <div class="input-group input-group-merge">
+                              <span class="input-group-text"><i class='bx bx-category'></i></span>
+                              <select class="form-select"
+                                id="monedaEditar"
+                                name="monedaEditar"
+                                aria-label="Selecciona el tipo de moneda"
+                                required>
+                                <option selected value="">Selecciona el tipo de moneda</option>
+                                {% for moneda in monedas %}
+                                    <option value="{{ moneda.id_moneda }}">{{ moneda.id_moneda }} - {{ moneda.nombre_moneda }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+                          {% comment %} CATEGORÍA DE INGRESOS {% endcomment %}
+                          <div class="mb-3">
+                            <label class="form-label" for="categoriaEditar">Categoría</label>
+                            <div class="input-group input-group-merge">
+                              <span class="input-group-text"><i class='bx bx-category'></i></span>
+                              <select class="form-select"
+                                id="categoriaEditar"
+                                name="categoriaEditar"
+                                aria-label="Selecciona una categoría"
+                                required>
+                                <option selected value="">Selecciona una categoría</option>
+                                {% for categoria in categorias %}
+                                  <option value="{{ categoria.id_categoria}}">{{ categoria.nombre}}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="form-text">Selecciona una categoría correspondiente al ingreso.</div>
+                          </div>
+                          {% comment %} SELECCIÓN DE MÉTODO {% endcomment %}
+                          <div class="mb-3">
+                            {% comment %} EFECTIVO {% endcomment %}
+                            <label class="form-label">Método:</label>
+                            <div class="form-check mt-2">
+                              <input
+                                name="metodoPagoEditar"
+                                class="form-check-input"
+                                type="radio"
+                                value="MP-EFEC"
+                                id="efectivoEditar"
+                                onchange="mostrarSelect()"
+                                checked
+                                required
+                              />
+                              <label class="form-check-label" for="efectivoEditar"> Efectivo </label>
+                              <select class="form-select"
+                                id="efectivoSelEditar"
+                                name="efectivoSelEditar"
+                                required
+                                style="display: block;">
+                                {% for cartera in carteras %}
+                                  <option value="{{ cartera.id_cuenta}}">{{ cartera.nombre_cuenta }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            {% comment %} TARJETA {% endcomment %}
+                            <div class="form-check mt-2">
+                              <input
+                                name="metodoPagoEditar"
+                                class="form-check-input"
+                                type="radio"
+                                value="MP-TARJ"
+                                id="tarjetaEditar"
+                                onchange="mostrarSelect()"
+                                required
+                              />
+                              <label class="form-check-label" for="tarjetaEditar"> Tarjeta </label>
+                              <select class="form-select"
+                                id="tarjetaSelEditar"
+                                name="tarjetaSelEditar"
+                                style="display: none;"
+                                required>
+                                {% for tarjeta in tarjetas %}
+                                  <option value="{{ tarjeta.id_cuenta }}">{{ tarjeta.nombre_cuenta }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label" for="notaEditar">Nota</label>
+                            <div class="input-group input-group-merge">
+                              <span id="basic-icon-default-message2" class="input-group-text"
+                                ><i class="bx bx-comment"></i
+                              ></span>
+                              <textarea
+                                id="notaEditar"
+                                name="notaEditar"
+                                class="form-control"
+                                placeholder="Notas del Ingreso"
+                                aria-label="Notas del Ingreso"
+                                aria-describedby="basic-icon-default-message2"
+                                required
+                              ></textarea>
+                            </div>
+                          </div>
+                      
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                      <button type="button" class="btn btn-primary" id="guardarCambios">Guardar cambios</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Modal para la edición -->
+
+
             </div>
             <!-- / Content -->
 
@@ -598,33 +742,10 @@
 
     <!-- JQUERY -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- OBTENCIÓN DE DATOS PARA ELIMINACIÓN -->
-    <script>
-      $(document).ready(function () {
-        $(".eliminar-btn").click(function () {
-          // Guarda una referencia a $(this) en una variable antes de la llamada AJAX
-          var that = $(this);
-          var id = that.data("id");
-          if (confirm("¿Estás seguro de que deseas eliminar este registro?")) {
-            $.ajax({
-                type: "POST",
-                url: "/eliminarTransaccion/",  // Ajusta la URL de tu vista de eliminación
-                data: { id: id, csrfmiddlewaretoken: '{{ csrf_token }}' },
-                success: function (data) {
-                    console.log(data);
-                    // Obtén la fila DataTable asociada
-                    // Elimina la fila directamente del DOM
-                    $(that).closest('tr').remove();
-                },
-                error: function () {
-                    alert("No fue posible eliminar este registro")
-                },
-            });
-          }
-        });
-      });
-      </script>
-    <!-- OBTENCIÓN DE DATOS PARA ELIMINACIÓN -->
+    <!-- JQUERY -->
+  
+    <!-- JS PARA EDICIÓN Y ELIMINACIÓN -->
+    <script src="{% static 'js/ingresos.js'%}"></script>
+    <!-- JS PARA EDICIÓN Y ELIMINACIÓN -->
   </body>
 </html>

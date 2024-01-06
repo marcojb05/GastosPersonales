@@ -372,20 +372,6 @@ class Ingresos (APIView):
         else:
             return True
         
-def eliminarTransaccion(request):
-    if request.method == "POST":
-        idTransaccion = request.POST.get("id")
-        print("TRANSACCIÓN: ", idTransaccion)
-        try:
-            transaccion = Transaccion.objects.get(id_transaccion=idTransaccion)
-            transaccion.delete()
-            return HttpResponse("Registro eliminado con éxito")
-        except Pago.DoesNotExist:
-            return HttpResponse("El registro no existe")
-        except IntegrityError:
-            return HttpResponse("El registro no puede ser eiminado porque se encuentra referenciado en otra parte.")
-            
-        
 # Gastos del usuario
 @method_decorator(login_required, name='dispatch')
 class Gastos (APIView):
@@ -971,6 +957,96 @@ class eliminarMeta(APIView):
         else:
             return True
 
+class actualizarTransaccion(APIView):
+    def get(self, request):
+        if request.method == "GET" and 'id_transaccion' in request.GET:
+            # Obtiene el usuario y su ID
+            usuario = request.user
+            usuario_id = usuario.id
+            
+            # Obtiene id_meta de la solicitud GET
+            id_transaccion = request.GET.get('id_transaccion')
+
+            # Consulta para obtener la instancia de MetaFinanciera del usuario
+            try:
+                transaccion = Transaccion.objects.get(id_transaccion=id_transaccion, fk_usuario=usuario_id)
+                
+                # Serializa los datos de la instancia de MetaFinanciera
+                # transaccion_data = serializers.serialize('json', [transaccion])
+                transaccion_data = {
+                    'id_transaccion': transaccion.id_transaccion,
+                    'fecha': transaccion.fecha,
+                    'monto': transaccion.monto,
+                    'moneda': transaccion.fk_moneda.id_moneda,
+                    'categoria': transaccion.fkcategoria.id_categoria,
+                    'metodoPago': transaccion.fk_cuenta.fk_metodo_pago.id_metodotipo,
+                    'cuenta': transaccion.fk_cuenta.id_cuenta,
+                    'descripcion': transaccion.descripcion,
+                }
+
+                return JsonResponse({'transaccion': transaccion_data})
+            except Transaccion.DoesNotExist:
+                return JsonResponse({"error": f"No se encontró ninguna transaccion con id_transaccion='{id_transaccion}' para el usuario actual"}, status=400)
+            
+    def post(self, request):
+        if self.comprobarCampos():
+            
+            try:
+                idEditar = request.POST.get('idEditar')
+                fechaEditar = request.POST.get('fechaEditar')
+                montoEditar = request.POST.get('montoEditar')
+                monedaEditar = request.POST.get('monedaEditar')
+                categoriaEditar = request.POST.get('categoriaEditar')
+                tarjetaSelEditar = request.POST['cuenta']
+                notaEditar = request.POST.get('notaEditar')
+                
+                transaccion = get_object_or_404(Transaccion, id_transaccion=idEditar)
+                transaccion.fecha = fechaEditar
+                transaccion.fk_moneda = Moneda.objects.get(id_moneda = monedaEditar)
+                transaccion.monto = montoEditar
+                transaccion.fkcategoria = Categoria.objects.get(id_categoria = categoriaEditar)
+                transaccion.fk_cuenta = Tarjeta.objects.get(id_cuenta = tarjetaSelEditar)
+                transaccion.descripcion = notaEditar
+                
+                transaccion.save()
+                
+                return Response({"message": "La edición se realizó con éxito"})
+            except IntegrityError as e:
+                return JsonResponse({"error": "Se encontró un registro dulicado"}, status=400)
+            except Exception as e:
+                print("ERROR: ", e)
+                return JsonResponse({"error": "No se pudo realizar la edición"}, status=400)
+            
+        else:
+            print("Todos los campos de edición son obligatorios")
+            return JsonResponse({'error': "Todos los campos de edición son obligatorios"}, status=400)
+        
+    def comprobarCampos(self):
+        if ('idEditar' not in self.request.POST or 'fechaEditar' not in self.request.POST or
+            'montoEditar' not in self.request.POST or 'monedaEditar' not in self.request.POST or
+            'categoriaEditar' not in self.request.POST or 'cuenta' not in self.request.POST or
+            'notaEditar' not in self.request.POST):
+            return False
+        else:
+            return True
+
+class eliminarTransaccion(APIView):
+    def post(self, request):
+        print("POST")
+        if 'id_transaccion' not in self.request.POST:
+            return JsonResponse({'error': "Ocurrió un error al reaizar esta operación"}, status=400)
+            
+        else:
+            try:
+                id_transaccion = request.POST.get('id_transaccion')
+                
+                transaccion = get_object_or_404(Transaccion, id_transaccion=id_transaccion)
+                
+                transaccion.delete()
+                
+                return Response({"message": "La meta se eliminó con éxito."})
+            except Exception as e:
+                return JsonResponse({"error": "No fue posible eliminar eñ registro"}, status=400)
 
 def Reestablecer(request):
     template_name = "forgot-password.html"

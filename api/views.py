@@ -459,7 +459,7 @@ class Gastos (APIView):
         
         # Para las tablas
         # Consulta las transacciones según las fechas y el usuario
-        ingresos = Transaccion.objects.filter(
+        gastos = Transaccion.objects.filter(
             Q(id_transaccion__startswith='G') &
             Q(fk_usuario=usuario_id)
         )
@@ -468,7 +468,7 @@ class Gastos (APIView):
             'categorias': categorias,
             'carteras': carteras,
             'tarjetas': tarjetas,
-            'ingresos': ingresos,
+            'gastos': gastos,
             'mostrarError': mensajeError,
             'error': error,
             'mostrarMensaje': mostrarMensaje,

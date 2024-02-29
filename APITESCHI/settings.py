@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'APITESCHI.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-DATABASES = {
+""" DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'finanzapp',
@@ -98,17 +98,17 @@ DATABASES = {
         'HOST': 'oregon-postgres.render.com',
         'PORT': '5432'
     }
+} """
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'finanzapp',
+        'USER': 'postgres',
+        'PASSWORD': 'Cc.-12345',
+        'HOST': 'localhost',
+        'PORT': '5432'
+    }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'finanzapp',
-#         'USER': 'postgres',
-#         'PASSWORD': 'Cc.-12345',
-#         'HOST': 'localhost',
-#         'PORT': '5432'
-#     }
-# }
 
 
 # Password validation
